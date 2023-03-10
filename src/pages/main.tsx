@@ -5,8 +5,10 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
 import PromptInput from "~/components/PromptInput";
+import { FormEvent, useEffect, useState } from "react";
 
 const Main: NextPage = () => {
+
 
   return (
     <>
@@ -20,12 +22,10 @@ const Main: NextPage = () => {
           <div className="text-3xl">
             Albaab
           </div>
-          <div className="">
+          <div className="text-center">
             AI-powered al-Quran summarization
           </div>
-          <div className="mt-10 p-10 w-2/3">
-              {/* <input className="px-4 mt-2 w-full h-20 rounded-lg shadow-md text-start text-slate-800 caret-slate-400">
-              </input> */}
+          <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center">
               <PromptInput/>
           </div>
         </div>
