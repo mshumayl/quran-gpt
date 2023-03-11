@@ -12,6 +12,8 @@ const PromptInput: FC = ({  }) => {
   const [inputLength, setInputLength] = useState<number>(0);
   const [aiResponse, setAiResponse] = useState([{"surah": 0, "verse": 0}]);
   
+  const maxInputLength = 140
+
   const submitApi = api.openai.submitPrompt.useMutation()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -41,21 +43,21 @@ const PromptInput: FC = ({  }) => {
               id="promptInput"
               className="p-2 flex w-full h-24 rounded-lg text-sm border border-dashed border-slate-400"
               placeholder="Query the Quran"
-              maxLength={200}
+              maxLength={maxInputLength}
               onChange={(event) => {
                 setInputValue(event.target.value);
               }}>
               </textarea>
-              <div className="text-end mx-2 my-1 text-xs text-slate-400">{inputLength}/200</div>
+              <div className="text-end mx-2 my-1 text-xs text-slate-400">{inputLength}/{maxInputLength}</div>
               <button type="submit" className="m-10 p-2 flex flex-col items-center bg-slate-300 rounded-lg border border-dashed border-slate-400">
                   Submit
               </button>
         </form>
-        <ul>
+        <ul className="flex flex-col items-center w-full">
            {aiResponse.map(({ surah, verse }) => {
               return ((surah !== 0) ? 
                 (<VerseCard surah={surah} verse={verse}/>) :
-                (<div>Results here</div>)
+                (<div></div>)
               );}
             )}
         </ul>

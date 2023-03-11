@@ -40,7 +40,7 @@ export const openAiRouter = createTRPCRouter({
             console.log(data)
 
             return {
-                response: data ? data : `[{"surah": 0, "verse": 0}`
+                response: data ? data : `[{"surah": 0, "verse": 0}]`
             }
         } catch(e) {
             return {e}
