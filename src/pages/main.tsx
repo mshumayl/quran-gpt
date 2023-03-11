@@ -5,7 +5,6 @@ import { signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
 import PromptInput from "~/components/PromptInput";
-import { FormEvent, useEffect, useState } from "react";
 
 const Main: NextPage = () => {
 

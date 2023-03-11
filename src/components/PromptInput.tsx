@@ -1,17 +1,30 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState, type FC } from 'react'
-
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import React, { useEffect, useState, type FC, type FormEvent  } from 'react'
+import { api } from '~/utils/api';
 
 const PromptInput: FC = ({  }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputLength, setInputLength] = useState<number>(0);
+  const [aiResponse, setAiResponse] = useState<string>("");
+  
+  const submitApi = api.openai.submitPrompt.useMutation()
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(inputValue);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    const res = await submitApi.mutateAsync({ userPrompt: inputValue })
+    // console.log(res)
+    const json = JSON.parse(res.response.replace(/[\n\r]/g, ''))
+    console.log(json)
   }
 
   useEffect(() => {
-    setInputLength(inputValue.length)
+    setInputLength(inputValue.length);
   }, [inputValue])
 
   return (
@@ -35,6 +48,7 @@ const PromptInput: FC = ({  }) => {
                   Submit
               </button>
         </form>
+        <span className="m-10 bg-red-300 w-full text-sm flex flex-col">Response:</span>
     </>
   )
 }
