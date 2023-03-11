@@ -17,6 +17,7 @@ const Main: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen w-screen flex-row pt-2 items-start justify-center bg-slate-100">
+        <Link href="/">Back</Link>
         <div className="flex flex-col w-full items-center justify-center gap-2 px-4 py-16 ">
           <div className="text-3xl">
             Albaab
