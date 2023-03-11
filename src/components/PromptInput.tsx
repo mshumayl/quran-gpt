@@ -5,11 +5,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React, { useEffect, useState, type FC, type FormEvent  } from 'react'
 import { api } from '~/utils/api';
+import VerseCard from './VerseCard';
 
 const PromptInput: FC = ({  }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputLength, setInputLength] = useState<number>(0);
-  const [aiResponse, setAiResponse] = useState<string>("");
+  const [aiResponse, setAiResponse] = useState([{"surah": 0, "verse": 0}]);
   
   const submitApi = api.openai.submitPrompt.useMutation()
 
@@ -22,7 +23,7 @@ const PromptInput: FC = ({  }) => {
     const json = JSON.parse(res.response.replace(/[\n\r]/g, ''))
     console.log(json)
 
-    setAiResponse(res.response.replace(/[\n\r]/g, ''))
+    setAiResponse(json)
   }
 
   useEffect(() => {
@@ -50,9 +51,16 @@ const PromptInput: FC = ({  }) => {
                   Submit
               </button>
         </form>
-        <span className="m-10 bg-red-300 w-full text-sm flex flex-col">Response: {aiResponse}</span>
+        <ul>
+           {aiResponse.map(({ surah, verse }) => {
+              return ((surah !== 0) ? 
+                (<VerseCard surah={surah} verse={verse}/>) :
+                (<div>Results here</div>)
+              );}
+            )}
+        </ul>
     </>
   )
 }
 
-export default PromptInput;
+  export default PromptInput;
