@@ -21,6 +21,8 @@ const PromptInput: FC = ({  }) => {
     // console.log(res)
     const json = JSON.parse(res.response.replace(/[\n\r]/g, ''))
     console.log(json)
+
+    setAiResponse(res.response.replace(/[\n\r]/g, ''))
   }
 
   useEffect(() => {
@@ -48,7 +50,7 @@ const PromptInput: FC = ({  }) => {
                   Submit
               </button>
         </form>
-        <span className="m-10 bg-red-300 w-full text-sm flex flex-col">Response:</span>
+        <span className="m-10 bg-red-300 w-full text-sm flex flex-col">Response: {aiResponse}</span>
     </>
   )
 }
