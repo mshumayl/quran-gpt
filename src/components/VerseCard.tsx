@@ -16,10 +16,10 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse }) => {
   //make tRPC calls to fetch surahName and verse here
   const dbFetch = api.db.fetchVerse.useQuery({surahNumber: surah.toString(), verseNumber: verse.toString()})
 
-  console.log("dbFetch:")
-  console.log(dbFetch.data)
+  // console.log("dbFetch:")
+  // console.log(dbFetch.data)
 
-  return (
+  return ((dbFetch.data) ? (
     <div className="bg-slate-200 m-10 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl">
       <div key={`${surah}_${verse}`}>{dbFetch.data?.surahName} {verse}</div>
       <br></br>
@@ -33,7 +33,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse }) => {
         <Link target="_blank" rel="noopener" passHref className="py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://quran.com/${surah}?startingVerse=${verse}`}>Full text</Link>
       </div>
     </div>
-  )
+  ) : (<div className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-10 rounded-lg bg-slate-200 py-1 px-2">Fetching verses...</div>))
 }
 
 export default VerseCard;

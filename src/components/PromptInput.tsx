@@ -11,21 +11,27 @@ const PromptInput: FC = ({  }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputLength, setInputLength] = useState<number>(0);
   const [aiResponse, setAiResponse] = useState([{"surah": 0, "verse": 0}]);
+  const [displayLoader, setDisplayLoader] = useState<boolean>(false);
   
   const maxInputLength = 140
 
   const submitApi = api.openai.submitPrompt.useMutation()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    setDisplayLoader((prevState) => !prevState)
     e.preventDefault();
     console.log(inputValue);
+    console.log(displayLoader)
+
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const res = await submitApi.mutateAsync({ userPrompt: inputValue })
     // console.log(res)
     const json = JSON.parse(res.response.replace(/[\n\r]/g, ''))
-    console.log(json)
+    // console.log(json)
 
     setAiResponse(json)
+    setDisplayLoader((prevState) => !prevState)
+    console.log(displayLoader)
   }
 
   useEffect(() => {
@@ -56,9 +62,10 @@ const PromptInput: FC = ({  }) => {
         </form>
         <ul className="flex flex-col items-center w-full">
            {aiResponse.map(({ surah, verse }) => {
-              return ((surah !== 0) ? 
-                (<VerseCard surah={surah} verse={verse}/>) :
-                (<div></div>)
+              return ((displayLoader) ? 
+                (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 py-1 px-2">Thinking...</div>) : (surah !== 0 ) ?
+                (<VerseCard surah={surah} verse={verse}/>) 
+                : (<></>)
               );}
             )}
         </ul>
