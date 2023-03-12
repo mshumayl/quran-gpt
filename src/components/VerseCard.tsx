@@ -23,6 +23,8 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse }) => {
       <div key={`${surah}_${verse}`}>{dbFetch.data?.surahName} {verse}</div>
       <br></br>
       <div>{dbFetch.data?.verseText}</div>
+      <br></br>
+      <div>{dbFetch.data?.verseTranslation}</div>
     </div>
   )
 }

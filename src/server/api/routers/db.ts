@@ -19,6 +19,8 @@ export const dbRouter = createTRPCRouter({
         
         const { surahNumber, verseNumber } = input;
         const id = `${surahNumber}_${verseNumber}`
+
+        //TODO: Shutdown connection after query
         const prisma = new PrismaClient();
 
 
@@ -36,13 +38,16 @@ export const dbRouter = createTRPCRouter({
                 id: id
             },
             select: {
-                verseText: true
+                verseText: true,
+                verseTranslation: true
             }
         })
 
         const surahName = querySurahName?.surahTName;
         const verseText = queryVerseText?.verseText;
+        const verseTranslation = queryVerseText?.verseTranslation;
 
-        return ({ surahName, verseText })
+
+        return ({ surahName, verseText, verseTranslation })
     }),
 });
