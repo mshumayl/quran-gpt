@@ -41,7 +41,7 @@ const PromptInput: FC = ({  }) => {
   return (
     <>
         <form onSubmit={handleSubmit} id="promptForm" name="promptForm" className="flex flex-col justify-center">
-              <label htmlFor="promptInput" className="flex mb-1 mx-1">Prompt</label>
+              <label htmlFor="promptInput" className="flex mb-1 mx-1 font-zilla-slab-italic">Prompt</label>
               <textarea
               form="promptForm"
               rows={2}
@@ -56,7 +56,7 @@ const PromptInput: FC = ({  }) => {
               </textarea>
               <div className="text-end mx-2 my-1 text-xs text-slate-400">{inputLength}/{maxInputLength}</div>
               <button type="submit" className="m-10 p-2 flex flex-col items-center bg-slate-300 rounded-lg border border-dashed border-slate-400 
-              hover:bg-slate-200 active:bg-slate-400">
+              hover:bg-slate-200 active:bg-slate-400 text-sm font-zilla-slab-italic">
                   Submit
               </button>
         </form>

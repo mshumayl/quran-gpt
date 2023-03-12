@@ -17,10 +17,10 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex min-h-screen flex-row pt-10 items-start justify-center bg-slate-100">
         <div className="flex flex-col items-center justify-center gap-2 px-4 py-16 ">
-          <div className="font-righteous text-6xl">
+          <div className="font-righteous text-3xl md:text-6xl">
             AI-Daleel
           </div>
-          <div className="">
+          <div className="text-center text-sm md:text-md font-zilla-slab-italic">
             AI-powered al-Quran daleel search
           </div>
           <div className="pt-10">
@@ -38,7 +38,11 @@ const Home: NextPage = () => {
               </div> */}
             </div>
             <div className="flex flex-col items-center pt-10">
-              <Link className="bg-slate-300 items-center mx-6 my-5 px-4 py-3 border-black rounded-full border-2 border-dashed hover:bg-slate-400 transition-all duration-75" href="main">Get started</Link>
+              <Link className="bg-slate-300 items-center mx-6 my-5 px-4 py-3 
+              border-slate-400 rounded-full border border-dashed hover:bg-slate-200 transition-all duration-75
+              text-center text-sm md:text-md font-zilla-slab-italic" href="main">
+                Get started
+              </Link>
             </div>
           </div>
 
