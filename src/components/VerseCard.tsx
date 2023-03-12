@@ -19,12 +19,12 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse }) => {
   console.log(dbFetch.data)
 
   return (
-    <div className="bg-slate-200 m-10 p-10 border border-dashed border-slate-400 w-full flex flex-col text-center">
+    <div className="bg-slate-200 m-10 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl">
       <div key={`${surah}_${verse}`}>{dbFetch.data?.surahName} {verse}</div>
       <br></br>
-      <div>{dbFetch.data?.verseText}</div>
+      <div className="font-lateef text-3xl">{dbFetch.data?.verseText}</div>
       <br></br>
-      <div>{dbFetch.data?.verseTranslation}</div>
+      <div className="font-zilla-slab-italic text-lg">{dbFetch.data?.verseTranslation}</div>
     </div>
   )
 }

@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: "lateef";
+    src: url("../../public/fonts/Lateef-ExtraLight.ttf");
+}
+@font-face {
+    font-family: "zilla-slab-italic";
+    src: url("../../public/fonts/ZillaSlab-LightItalic.ttf");
+}
+@font-face {
+    font-family: "righteous";
+    src: url("../../public/fonts/Righteous-Regular.ttf");
+}

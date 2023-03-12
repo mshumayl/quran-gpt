@@ -17,13 +17,13 @@ const Main: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen w-screen flex-col pt-2 items-start justify-center bg-slate-100">
-        <Link href="/">Back</Link>
+        <Link className="ml-10" href="/">Back</Link>
         <div className="flex flex-col w-full items-center justify-center gap-2 px-4 py-16 ">
-          <div className="text-3xl">
-            Albaab
+          <div className="font-righteous text-6xl">
+            AI-Daleel
           </div>
           <div className="text-center">
-            AI-powered al-Quran summarization
+            AI-powered al-Quran daleel search
           </div>
           <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center">
               <PromptInput/>
