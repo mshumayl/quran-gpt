@@ -8,8 +8,9 @@ import { getSession, GetSessionParams, signIn, signOut, useSession } from "next-
 import { api } from "~/utils/api";
 import NavBar from "~/components/NavBar";
 import { AppProps } from "next/app";
+import MobileNavBar from "~/components/MobileNavBar";
 
-const Home: NextPage<HomeProps> = (props: AppProps) => {
+const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
@@ -20,7 +21,7 @@ const Home: NextPage<HomeProps> = (props: AppProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex flex-col min-h-screen items-center bg-slate-100">
-        <NavBar/>
+        <NavBar/><MobileNavBar/>
         <div className="flex flex-col items-center justify-center gap-2 px-4 py-20">
           <div className="font-righteous text-3xl md:text-6xl">
             AI-Daleel
