@@ -1,10 +1,30 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { GetSessionParams, signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
 import PromptInput from "~/components/PromptInput";
+
+
+import { getSession } from "next-auth/react"
+
+export async function getServerSideProps(context: GetSessionParams | undefined) {
+  const session = await getSession(context)
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: 'auth/signin',
+        permanent: false,
+      },
+    }
+  }
+
+  return {
+    props: { session }
+  }
+}
 
 const Main: NextPage = () => {
 
