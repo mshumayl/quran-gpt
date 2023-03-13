@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { getSession, GetSessionParams, signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
 import NavBar from "~/components/NavBar";
+import { AppProps } from "next/app";
 
-const Home: NextPage = () => {
+const Home: NextPage<HomeProps> = (props: AppProps) => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
