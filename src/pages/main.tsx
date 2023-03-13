@@ -8,6 +8,7 @@ import PromptInput from "~/components/PromptInput";
 
 
 import { getSession } from "next-auth/react"
+import NavBar from "~/components/NavBar";
 
 export async function getServerSideProps(context: GetSessionParams | undefined) {
   const session = await getSession(context)
@@ -36,7 +37,8 @@ const Main: NextPage = () => {
         <meta name="description" content="AI-powered al-Quran daleel search" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen w-screen flex-col pt-2 items-start bg-slate-100">
+      <main className="flex flex-col min-h-screen items-center bg-slate-100">
+        <NavBar/>
         <Link className="flex w-full ml-3 text-slate-600 font-zilla-slab-italic" href="/">Back</Link>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
           <div className="font-righteous text-3xl md:text-6xl">
