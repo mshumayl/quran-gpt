@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { getSession, GetSessionParams, signIn, signOut, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
+import NavBar from "~/components/NavBar";
+import { AppProps } from "next/app";
+import MobileNavBar from "~/components/MobileNavBar";
 
 const Home: NextPage = () => {
   const hello = api.example.hello.useQuery({ text: "from tRPC" });
@@ -15,8 +20,9 @@ const Home: NextPage = () => {
         <meta name="description" content="AI-powered al-Quran daleel search" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-row pt-10 items-start justify-center bg-slate-100">
-        <div className="flex flex-col items-center justify-center gap-2 px-4 py-16 ">
+      <main className="flex flex-col min-h-screen items-center bg-slate-100">
+        <NavBar/><MobileNavBar/>
+        <div className="flex flex-col items-center justify-center gap-2 px-4 py-20">
           <div className="font-righteous text-3xl md:text-6xl">
             AI-Daleel
           </div>
