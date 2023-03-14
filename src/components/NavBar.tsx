@@ -1,6 +1,6 @@
-import { useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { FC } from 'react'
+import React, { type FC } from 'react'
 
 
 const NavBar: FC = () => {
@@ -14,7 +14,13 @@ const NavBar: FC = () => {
         </div>
         <div className="mr-1 flex gap-4 justify-end w-1/2 font-zilla-slab-italic">
             {(sessionData) ? (<div className="text-xs mr-1">Logged in as {sessionData.user.email}</div>) : (<></>)}
-            <Link className="text-xs self-center hover:text-emerald-500 border border-slate-500 px-1 bg-white border-dashed" href="/">LOG OUT</Link>
+            {/* <Link className="text-xs self-center hover:text-emerald-500 border border-slate-500 px-1 bg-white border-dashed" href="/">LOG OUT</Link> */}
+            <button
+              className="text-xs self-center hover:text-emerald-500 border border-slate-500 px-1 bg-white border-dashed"
+              onClick={sessionData ? () => void signOut() : () => void signIn()}
+            >
+            {sessionData ? "Sign out" : "Sign in"}
+            </button>
         </div>
     </div>
   )
