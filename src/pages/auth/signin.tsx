@@ -18,29 +18,30 @@ const SignIn = ({ providers }: { providers: AppProps }) => {
 
   const cmapMain: {[index: string]: unknown} = {
     "google": "bg-red-200",
-    "discord": "bg-purple-200"
+    "discord": "bg-purple-200",
+    "github": "bg-slate-300"
   }
 
   const cmapBorder: {[index: string]: unknown} = {
     "google": "border-red-400",
-    "discord": "border-purple-400"
+    "discord": "border-purple-400",
+    "github": "border-slate-500"
   }
 
   
   const cmapHover: {[index: string]: unknown} = {
     "google": "hover:bg-red-300",
-    "discord": "hover:bg-purple-300"
+    "discord": "hover:bg-purple-300",
+    "github": "hover:bg-slate-400"
   }
 
   const cmapDivide: {[index: string]: unknown} = {
     "google": "divide-red-300",
-    "discord": "divide-purple-300"
+    "discord": "divide-purple-300",
+    "github": "divide-slate-400"
   }
 
 
-  Object.values(providers).map(({ id }) => (
-    console.log(cmapMain[id])
-  ))
 
   return (
     <>
@@ -65,7 +66,7 @@ const SignIn = ({ providers }: { providers: AppProps }) => {
                         })
                     }
                     >
-                      <div className={`flex flex-row divide-x divide-dashed ${cmapDivide[id]} divide-x-2`}>
+                      <div className={`flex flex-row divide-x divide-dashed ${cmapDivide[id]}`}>
                         <div className="flex w-1/3 justify-center">
                           <Image alt="image" src={`/icons/${id}.svg`} width="15" height="15" className=""/>
                         </div>
