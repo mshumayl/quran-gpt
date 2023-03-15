@@ -8,21 +8,9 @@ import { api } from '~/utils/api';
 import VerseCard from './VerseCard';
 
 const PromptInput: FC = ({  }) => {
-  type responseType = {
-    "surah": number,
-    "verse": number
-  }[]
-
-  const defaultResponse = [{"surah": 0, "verse": 0}, {"surah": 0, "verse": 0}, {"surah": 0, "verse": 0}]
-
   const [inputValue, setInputValue] = useState<string>("");
   const [inputLength, setInputLength] = useState<number>(0);
-  const [aiResponse, setAiResponse] = useState<responseType>(() => {
-        const cachedResponse = (typeof window !== "undefined") ? localStorage.getItem("cached_response") : ""; //Because of SSR, need to check if code is running client-side
-    const parsedCachedResponse = JSON.parse(cachedResponse || "");
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return parsedCachedResponse || defaultResponse;
-  });
+  const [aiResponse, setAiResponse] = useState([{"surah": 0, "verse": 0}]);
   const [displayLoader, setDisplayLoader] = useState<boolean>(false);
   
   const maxInputLength = 140
@@ -49,18 +37,6 @@ const PromptInput: FC = ({  }) => {
   useEffect(() => {
     setInputLength(inputValue.length);
   }, [inputValue])
-
-  //Save in localStorage
-  useEffect(() => {
-    localStorage.setItem("cached_response", JSON.stringify(aiResponse));
-  }, [aiResponse]);
-  
-  // useEffect(() => {
-  //   const aiResponse = localStorage.getItem("cached_response");
-  //   if (aiResponse) {
-  //     setAiResponse(JSON.parse(aiResponse));
-  //   }
-  // }, []);
 
   return (
     <>
