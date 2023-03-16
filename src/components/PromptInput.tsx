@@ -1,42 +1,72 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import router from 'next/router';
 import React, { useEffect, useState, type FC, type FormEvent  } from 'react'
 import { api } from '~/utils/api';
-import VerseCard from './VerseCard';
+// import VerseCard from './VerseCard';
+
+// Dynamic import with SSR: false to avoid hydration issues. Refer to https://github.com/mshumayl/quran-gpt/issues/7.
+import dynamic from 'next/dynamic';
+const VerseCard = dynamic(() => import("./VerseCard"), {ssr: false})
 
 const PromptInput: FC = ({  }) => {
+ 
+  type responseType = {
+    "surah": number,
+    "verse": number
+  }[]
+  
+  const defaultResponse: responseType = [{"surah": 0, "verse": 0}];
+
   const [inputValue, setInputValue] = useState<string>("");
   const [inputLength, setInputLength] = useState<number>(0);
-  const [aiResponse, setAiResponse] = useState([{"surah": 0, "verse": 0}]);
+
+  const [aiResponse, setAiResponse] = useState<responseType>(() => {
+    // Assign cachedResponse if useState is being run on client-side
+    const cachedResponse = (
+      typeof window !== "undefined" && localStorage.getItem("cached_response") !== null && localStorage.getItem("cached_response") !== undefined) 
+      ? JSON.parse(localStorage.getItem("cached_response") || `[{}, {}, {}]`)
+      : `[{}, {}, {}]`;
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return cachedResponse;
+  });
   const [displayLoader, setDisplayLoader] = useState<boolean>(false);
   
-  const maxInputLength = 140
+  const maxInputLength = 140;
 
-  const submitApi = api.openai.submitPrompt.useMutation()
+  const submitApi = api.openai.submitPrompt.useMutation();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    setDisplayLoader((prevState) => !prevState)
+    
+    setDisplayLoader((prevState) => !prevState);
     e.preventDefault();
     console.log(inputValue);
-    console.log(displayLoader)
+    console.log(displayLoader);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    const res = await submitApi.mutateAsync({ userPrompt: inputValue })
-    // console.log(res)
-    const json = JSON.parse(res.response.replace(/[\n\r]/g, ''))
-    // console.log(json)
+    const res = await submitApi.mutateAsync({ userPrompt: inputValue });
+    // console.log(res);
+    const json = JSON.parse(res.response.replace(/[\n\r]/g, ''));
+    // console.log(json);
 
-    setAiResponse(json)
-    setDisplayLoader((prevState) => !prevState)
-    console.log(displayLoader)
+    setAiResponse(json);
+    setDisplayLoader((prevState) => !prevState);
+    console.log(displayLoader);
   }
 
   useEffect(() => {
     setInputLength(inputValue.length);
-  }, [inputValue])
+  }, [inputValue]);
+
+  //Save in localStorage
+  useEffect(() => {
+    localStorage.setItem("cached_response", JSON.stringify(aiResponse));
+  }, [aiResponse]);
 
   return (
     <>
@@ -61,10 +91,12 @@ const PromptInput: FC = ({  }) => {
               </button>
         </form>
         <ul className="flex flex-col items-center w-full">
-           {aiResponse.map(({ surah, verse }) => {
-              return ((displayLoader) ? 
-                (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 py-1 px-2">Thinking...</div>) : (surah !== 0 ) ?
-                (<VerseCard surah={surah} verse={verse}/>) 
+          {/* Check if aiResponse is a valid array of objects before mapping. */}
+           {aiResponse && aiResponse.map && aiResponse.map(({ surah, verse }) => {
+              return ((displayLoader) 
+                ? (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 py-1 px-2">Thinking...</div>) 
+                : (surah !== 0) 
+                ? (<VerseCard surah={surah} verse={verse}/>) 
                 : (<></>)
               );}
             )}
