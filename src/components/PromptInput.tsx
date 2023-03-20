@@ -42,21 +42,20 @@ const PromptInput: FC = ({  }) => {
   const submitApi = api.openai.submitPrompt.useMutation();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    
     setDisplayLoader((prevState) => !prevState);
     e.preventDefault();
-    console.log(inputValue);
-    console.log(displayLoader);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     const res = await submitApi.mutateAsync({ userPrompt: inputValue });
-    // console.log(res);
     const json = JSON.parse(res.response.replace(/[\n\r]/g, ''));
-    // console.log(json);
 
     setAiResponse(json);
     setDisplayLoader((prevState) => !prevState);
     console.log(displayLoader);
+  }
+
+  const handleClear = () => {
+    setAiResponse(defaultResponse);
   }
 
   useEffect(() => {
@@ -90,11 +89,16 @@ const PromptInput: FC = ({  }) => {
                   Submit
               </button>
         </form>
+        
+        {(aiResponse.length === 3) 
+        ? (<button onClick={handleClear} className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic hover:text-gray-500">Clear results</button>) 
+        : (<></>)}
+        
         <ul className="flex flex-col items-center w-full">
           {/* Check if aiResponse is a valid array of objects before mapping. */}
            {aiResponse && aiResponse.map && aiResponse.map(({ surah, verse }) => {
               return ((displayLoader) 
-                ? (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 py-1 px-2">Thinking...</div>) 
+                ? (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 mt-10 py-1 px-2">Thinking...</div>) 
                 : (surah !== 0) 
                 ? (<VerseCard surah={surah} verse={verse}/>) 
                 : (<></>)
