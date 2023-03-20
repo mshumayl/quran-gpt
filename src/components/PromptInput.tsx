@@ -29,8 +29,8 @@ const PromptInput: FC = ({  }) => {
     // Assign cachedResponse if useState is being run on client-side
     const cachedResponse = (
       typeof window !== "undefined" && localStorage.getItem("cached_response") !== null && localStorage.getItem("cached_response") !== undefined) 
-      ? JSON.parse(localStorage.getItem("cached_response") || `[{}, {}, {}]`)
-      : `[{}, {}, {}]`;
+      ? JSON.parse(localStorage.getItem("cached_response") || `${defaultResponse}`)
+      : `${defaultResponse}`;
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return cachedResponse;
