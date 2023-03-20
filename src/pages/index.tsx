@@ -11,7 +11,7 @@ import { AppProps } from "next/app";
 import MobileNavBar from "~/components/MobileNavBar";
 
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+  // const hello = api.example.hello.useQuery({ text: "from tRPC" });
 
   return (
     <>
