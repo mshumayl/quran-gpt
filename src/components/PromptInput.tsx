@@ -11,6 +11,7 @@ import { api } from '~/utils/api';
 
 // Dynamic import with SSR: false to avoid hydration issues. Refer to https://github.com/mshumayl/quran-gpt/issues/7.
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 const VerseCard = dynamic(() => import("./VerseCard"), {ssr: false})
 
 const PromptInput: FC = ({  }) => {
@@ -100,7 +101,11 @@ const PromptInput: FC = ({  }) => {
               return ((displayLoader) 
                 ? (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 mt-10 py-1 px-2">Thinking...</div>) 
                 : (surah !== 0) 
-                ? (<VerseCard surah={surah} verse={verse}/>) 
+                ? (
+                  <Link href={`verse/${surah}_${verse}`} className="flex items-center">
+                    <VerseCard surah={surah} verse={verse}/>
+                  </Link>
+                ) 
                 : (<></>)
               );}
             )}

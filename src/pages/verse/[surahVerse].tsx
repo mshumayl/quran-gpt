@@ -74,7 +74,7 @@ const Main: NextPage = () => {
           <div className="text-center text-sm md:text-md font-zilla-slab-italic">
             AI-powered al-Quran daleel search
           </div>
-          <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center">
+          <div className="mt-10 md:p-10 w-full md:w-7/8 flex flex-col items-center">
             {(surah && verse) ? (<VerseCard surah={parseInt(surah)} verse={parseInt(verse)}/>) : (<>No</>)} 
           </div>
         </div>
