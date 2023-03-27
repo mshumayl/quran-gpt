@@ -23,7 +23,6 @@ export const dbRouter = createTRPCRouter({
         //TODO: Shutdown connection after query
         const prisma = new PrismaClient();
 
-
         const querySurahName = await prisma.surahMetadata.findUnique({
             where: { 
                 id: surahNumber
@@ -47,7 +46,35 @@ export const dbRouter = createTRPCRouter({
         const verseText = queryVerseText?.verseText;
         const verseTranslation = queryVerseText?.verseTranslation;
 
-
         return ({ surahName, verseText, verseTranslation })
+    }),
+
+    fetchDetails: publicProcedure
+    .input(z.object({ surahNumber: z.string() }))
+    .query(async ({ input }) => {
+        
+        const { surahNumber } = input;
+
+        //TODO: Shutdown connection after query
+        const prisma = new PrismaClient();
+
+        const querySurahMetadata = await prisma.surahMetadata.findUnique({
+            where: { 
+                id: surahNumber
+            },
+            select: {
+                surahTName: true,
+                surahName: true,
+                surahEName: true,
+                surahType: true
+            }
+        })
+
+        const surahTName = querySurahMetadata?.surahTName
+        const surahName = querySurahMetadata?.surahName
+        const surahEName = querySurahMetadata?.surahEName
+        const surahType = querySurahMetadata?.surahType
+
+        return ({ surahTName, surahName, surahEName, surahType })
     }),
 });
