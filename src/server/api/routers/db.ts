@@ -89,8 +89,14 @@ export const dbRouter = createTRPCRouter({
         const prisma = new PrismaClient();
 
         //TODO: Check if there exists a previous save
+        const existingSave = await prisma.savedSnippets.findMany({
+            where: { 
+                userId: input.userId,
+                verseId: input.verseId
+            },
+        })
 
-        try {
+        if (existingSave.length === 0) {
             const snippet = await prisma.savedSnippets.create({
                 data: {
                     userId: input.userId,
@@ -98,10 +104,9 @@ export const dbRouter = createTRPCRouter({
                 },
             })
             console.log(snippet)
-            return(snippet)
-        } catch (e) {
-            console.log(`Server error: ${e}`)
-            return(`Server error: ${e}`)
+            return(`Verse successfully bookmarked.`)
+        } else {
+            return (`This verse has been bookmarked previously.`)
         }
     })
 });
