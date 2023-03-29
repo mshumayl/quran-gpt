@@ -42,6 +42,7 @@ const PromptInput: FC = ({  }) => {
 
   const submitApi = api.openai.submitPrompt.useMutation();
 
+  
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setDisplayLoader((prevState) => !prevState);
     e.preventDefault();
@@ -55,9 +56,11 @@ const PromptInput: FC = ({  }) => {
     console.log(displayLoader);
   }
 
+
   const handleClear = () => {
     setAiResponse(defaultResponse);
   }
+
 
   useEffect(() => {
     setInputLength(inputValue.length);

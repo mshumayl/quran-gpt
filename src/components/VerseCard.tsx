@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { useState, type FC } from 'react'
+import React, { type FC } from 'react'
+import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/utils/api';
 
 interface VerseCardProps {
@@ -11,10 +14,20 @@ interface VerseCardProps {
   isDetailed?: boolean;
 }
 
-
-
 const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
-  // const [verseText, setVerseText] = useState<string>("")
+  
+  const { data: session } = useSession();
+
+  const saveApi = api.db.saveSnippet.useMutation();
+  const handleSave = async () => {
+    console.log("Clicked Save");
+    if (session) {
+      const saveRes = await saveApi.mutateAsync({ verseId: `${surah}_${verse}`, userId: session?.user.id });
+      console.log(saveRes);
+    } else {
+      console.log("Unable to save. Please log in.")
+    }
+  }
 
   //make tRPC calls to fetch surahName and verse here
   const dbFetch = api.db.fetchVerse.useQuery({surahNumber: surah.toString(), verseNumber: verse.toString()})
@@ -49,12 +62,17 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
         {
           (isDetailed) //Renders only in verse/ endpoint
           ? (
-            <div className="flex flex-col sm:flex-row mt-5 gap-2 sm:gap-6 justify-center items-center text-xs font-zilla-slab-italic text-slate-600 ">
-              <div className="">References</div>
-              <Link target="_blank" rel="noopener" passHref className="shadow-inner py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://www.alim.org/quran/tafsir/ibn-kathir/surah/${surah}/${verse}/`}>Tafseer ibn Kathir</Link>
-              <Link target="_blank" rel="noopener" passHref className="shadow-inner py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://www.altafsir.com/AsbabAlnuzol.asp?SoraName=${surah}&Ayah=${verse}&search=yes&img=A&LanguageID=2`}>Asbaab al-Nuzul</Link>
-              <Link target="_blank" rel="noopener" passHref className="shadow-inner py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://quran.com/${surah}?startingVerse=${verse}`}>Full text</Link>
-            </div>
+            <>
+              <div className="flex flex-col sm:flex-row mt-5 gap-2 sm:gap-6 justify-center items-center text-xs font-zilla-slab-italic text-slate-600 ">
+                <div className="">References</div>
+                <Link target="_blank" rel="noopener" passHref className="shadow-inner py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://www.alim.org/quran/tafsir/ibn-kathir/surah/${surah}/${verse}/`}>Tafseer ibn Kathir</Link>
+                <Link target="_blank" rel="noopener" passHref className="shadow-inner py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://www.altafsir.com/AsbabAlnuzol.asp?SoraName=${surah}&Ayah=${verse}&search=yes&img=A&LanguageID=2`}>Asbaab al-Nuzul</Link>
+                <Link target="_blank" rel="noopener" passHref className="shadow-inner py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://quran.com/${surah}?startingVerse=${verse}`}>Full text</Link>
+              </div>
+              <div className="flex justify-end -mb-4 cursor-pointer" onClick={handleSave}>
+                Save
+              </div>
+            </>
           ) 
           : (<></>)
         }

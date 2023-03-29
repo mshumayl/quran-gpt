@@ -1,3 +1,4 @@
+import { useSession } from 'next-auth/react';
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-var-requires */
@@ -11,6 +12,7 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+import { getServerAuthSession } from "~/server/auth";
 
 export const dbRouter = createTRPCRouter({
   fetchVerse: publicProcedure
@@ -77,4 +79,17 @@ export const dbRouter = createTRPCRouter({
 
         return ({ surahTName, surahName, surahEName, surahType })
     }),
+
+    saveSnippet: protectedProcedure
+    .input(z.object( { verseId: z.string(), userId: z.string() } ))
+    .mutation(( { input } ) => {
+
+        try {
+            console.log("SERVER: Run saveSnippet")
+            console.log(input.verseId, input.userId)
+        } catch (e) {
+            console.log("Error!")
+            console.log(e)
+        }
+    })
 });
