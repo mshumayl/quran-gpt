@@ -7,6 +7,8 @@ import Link from 'next/link';
 import React, { type FC } from 'react'
 import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/utils/api';
+import Image from 'next/image';
+
 
 interface VerseCardProps {
   surah: number;
@@ -70,6 +72,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
                 <Link target="_blank" rel="noopener" passHref className="shadow-inner py-2 px-3 border border-dashed border-slate-400 w-max bg-slate-50 h-max hover:bg-slate-100" href={`https://quran.com/${surah}?startingVerse=${verse}`}>Full text</Link>
               </div>
               <div className="flex justify-end -mb-4 cursor-pointer" onClick={handleSave}>
+                {/* <Image alt="image" src={`/icons/bookmark.svg`} width="30" height="30" className="fill-red-600"/> */}
                 Save
               </div>
             </>

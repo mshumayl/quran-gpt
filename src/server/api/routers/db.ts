@@ -88,9 +88,9 @@ export const dbRouter = createTRPCRouter({
         //TODO: Shutdown connection after query
         const prisma = new PrismaClient();
 
-        try {
-            console.log("SERVER: Run saveSnippet")
+        //TODO: Check if there exists a previous save
 
+        try {
             const snippet = await prisma.savedSnippets.create({
                 data: {
                     userId: input.userId,
