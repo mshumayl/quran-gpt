@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { useSession } from 'next-auth/react';
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -82,14 +83,25 @@ export const dbRouter = createTRPCRouter({
 
     saveSnippet: protectedProcedure
     .input(z.object( { verseId: z.string(), userId: z.string() } ))
-    .mutation(( { input } ) => {
+    .mutation(async ( { input } ) => {
+
+        //TODO: Shutdown connection after query
+        const prisma = new PrismaClient();
 
         try {
             console.log("SERVER: Run saveSnippet")
-            console.log(input.verseId, input.userId)
+
+            const snippet = await prisma.savedSnippets.create({
+                data: {
+                    userId: input.userId,
+                    verseId: input.verseId
+                },
+            })
+            console.log(snippet)
+            return(snippet)
         } catch (e) {
-            console.log("Error!")
-            console.log(e)
+            console.log(`Server error: ${e}`)
+            return(`Server error: ${e}`)
         }
     })
 });
