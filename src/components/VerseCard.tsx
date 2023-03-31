@@ -43,7 +43,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
   
   return ((dbFetch.data) ? (
     <>
-      <div className={`bg-slate-200 m-10 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")}`}>
+      <div className={`bg-slate-200 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")}`}>
         {
           (isDetailed && dbFetchDetails) //Renders only in verse/ endpoint
           ? (

@@ -10,6 +10,8 @@ const NavBar: FC = () => {
     <div className="bg-slate-200 border-slate-500 border-b border-dashed h-12 items-center w-full flex-row px-2 hidden sm:flex">
         <div className="ml-2 flex flex-row gap-4 w-1/3 font-zilla-slab-italic">
             <Link className="hover:text-emerald-500" href="/">Home</Link>
+            <Link className="hover:text-emerald-500" href="/main">Query daleel</Link>
+            <Link className="hover:text-emerald-500" href="/savedVerses">Saved verses</Link>
             {/* <Link className="hover:text-emerald-500" href="/main">Find Daleel</Link> */}
         </div>
         <div className="mr-1 flex gap-4 justify-end w-2/3 font-zilla-slab-italic">

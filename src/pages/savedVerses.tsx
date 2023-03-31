@@ -13,8 +13,6 @@ import PromptInput from "~/components/PromptInput";
 import { getSession } from "next-auth/react"
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
-import { useEffect, useState } from "react";
-import { TRPCClientIncomingMessage, TRPCResponseMessage } from "@trpc/server/rpc";
 import VerseCard from "~/components/VerseCard";
 
 export async function getServerSideProps(context: GetSessionParams | undefined) {
@@ -70,19 +68,19 @@ const Bookmarks = () => {
             <meta name="description" content="AI-powered al-Quran daleel search" />
             <link rel="icon" href="/favicon.ico" />
           </Head>
-          <main className="flex flex-col min-h-screen items-center bg-slate-100">
+          <main className="flex flex-col items-center bg-slate-100">
             <NavBar/><MobileNavBar/>
             <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
               <div className="font-zilla-slab-italic text-3xl md:text-6xl">
                 Saved Verses
               </div>
-              <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center">
+              <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max md:space-y-10 mt-5 overflow-visible md:items-center md:align-top">
                  {(savedVerses && savedVerses.map && savedVerses.map(({ surah, verse }) => {
                   return ((surah !== undefined && verse !== undefined) ? 
-                    (<Link key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`} className="flex items-center">
+                    (<Link key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`} className="flex flex-col items-center w-full h-max">
                       <VerseCard surah={parseInt(surah)} verse={parseInt(verse)}/>
                     </Link>)
-                    : (<>You have no saved verses</>)
+                    : (<div className="flex flex-col items-center text-center font-zilla-slab-italic">You have no saved verses.</div>)
                   )
                  })) 
                  }

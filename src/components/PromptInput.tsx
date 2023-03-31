@@ -98,7 +98,7 @@ const PromptInput: FC = ({  }) => {
         ? (<button onClick={handleClear} className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic hover:text-gray-500">Clear results</button>) 
         : (<></>)}
         
-        <ul className="flex flex-col items-center w-full">
+        <ul className="flex flex-col items-center w-full gap-10 mt-10">
           {/* Check if aiResponse is a valid array of objects before mapping. */}
            {aiResponse && aiResponse.map && aiResponse.map(({ surah, verse }) => {
               return ((displayLoader) 
