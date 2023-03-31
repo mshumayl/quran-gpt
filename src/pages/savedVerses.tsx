@@ -66,7 +66,7 @@ const Bookmarks = () => {
     return (
         <>
           <Head>
-            <title>Bookmarks</title>
+            <title>Saved Verses</title>
             <meta name="description" content="AI-powered al-Quran daleel search" />
             <link rel="icon" href="/favicon.ico" />
           </Head>
