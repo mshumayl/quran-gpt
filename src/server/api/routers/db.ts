@@ -113,6 +113,7 @@ export const dbRouter = createTRPCRouter({
     fetchUserSavedSnippets: protectedProcedure
     .input(z.object( { userId: z.string() } ))
     .query(async ( {input} ) => {
+        console.log("In fetchUserSavedSnippets")
         const prisma = new PrismaClient();
 
         const userSavedSnippets = await prisma.savedSnippets.findMany({
@@ -123,8 +124,8 @@ export const dbRouter = createTRPCRouter({
                 verseId: true,
             }
         })
-
-        return ( { userSavedSnippets } )
+        console.log(userSavedSnippets)
+        return ({ userSavedSnippets })
 
     })
 });

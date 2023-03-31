@@ -48,6 +48,7 @@ const Main: NextPage = () => {
             AI-powered al-Quran daleel search
           </div>
           <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center">
+              {/* TODO: Pass session object into PromptInput into VerseCard */}
               <PromptInput/>
           </div>
         </div>

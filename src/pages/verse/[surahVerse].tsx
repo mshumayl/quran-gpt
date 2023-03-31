@@ -14,6 +14,8 @@ import MobileNavBar from "~/components/MobileNavBar";
 import VerseCard from "~/components/VerseCard";
 import { useRouter } from "next/router";
 
+//TODO: Use getStaticProps to get verse data
+
 export async function getServerSideProps(context: GetSessionParams | undefined) {
   const session = await getSession(context)
 
