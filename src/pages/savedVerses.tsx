@@ -74,7 +74,7 @@ const Bookmarks = () => {
               <div className="font-zilla-slab-italic text-3xl md:text-6xl">
                 Saved Verses
               </div>
-              <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max md:space-y-10 mt-5 overflow-visible md:items-center md:align-top">
+              <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max space-y-10 mt-5 overflow-visible md:items-center md:align-top">
                  {(savedVerses && savedVerses.map && savedVerses.map(({ surah, verse }) => {
                   return ((surah !== undefined && verse !== undefined) ? 
                     (<Link key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`} className="flex flex-col items-center w-full h-max md:break-inside-avoid">
