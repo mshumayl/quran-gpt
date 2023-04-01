@@ -21,7 +21,7 @@ const NavBar: FC = () => {
             {/* <Link className="text-xs self-center hover:text-emerald-500 border border-slate-500 px-1 bg-white border-dashed" href="/">LOG OUT</Link> */}
             <button
               className="text-xs self-center rounded-md p-1 bg-slate-100 hover:bg-slate-300 transition-all shadow-inner"
-              onClick={sessionData ? () => void signOut() : () => void signIn()}
+              onClick={sessionData ? () => void signOut({ callbackUrl: '/' }) : () => void signIn()}
             >
             {sessionData ? "Sign out" : "Sign in"}
             </button>

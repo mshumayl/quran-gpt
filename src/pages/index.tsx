@@ -52,8 +52,13 @@ const Home: NextPage = () => {
             </div>
             <div className="flex flex-col items-center pt-10">
               <Link className="bg-slate-300 items-center mx-6 my-5 px-4 py-3 
-              border-slate-400 rounded-full border border-dashed hover:bg-slate-200 transition-all duration-75
-              text-center text-sm md:text-md font-zilla-slab-italic" href="main">
+              border-slate-400 rounded-full border border-dashed hover:bg-slate-200 active:bg-slate-100
+              transition-all duration-75
+              text-center text-sm md:text-md font-zilla-slab-italic
+              shadow-lg translate-x-1 -translate-y-1 
+              hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-md
+              active:translate-x-0 active:-translate-y-0 active:shadow-inner
+              " href="main">
                 Get started
               </Link>
             </div>

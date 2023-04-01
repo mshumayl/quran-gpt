@@ -100,7 +100,7 @@ const PromptInput: FC = ({  }) => {
         </form>
         
         {(aiResponse.length === 3) 
-        ? (<button onClick={handleClear} className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic hover:text-gray-500">Clear results</button>) 
+        ? (<button onClick={handleClear} className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic text-slate-600 hover:text-emerald-500">Clear results</button>) 
         : (<></>)}
         
         <ul className="flex flex-col items-center w-full gap-10 mt-10">
