@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { type NextPage } from "next";
 import { type AppProps } from "next/app";
 import Head from "next/head";
 import { signIn, getProviders } from "next-auth/react";
@@ -48,7 +47,7 @@ const SignIn = ({ providers }: { providers: AppProps }) => {
       <Head>
         <title>Log In - AI-Daleel</title>
         <meta name="description" content="AI-powered al-Quran daleel search" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen items-center bg-slate-100">
         <div className="flex flex-col mt-32 w-2/3 md:w-1/3">

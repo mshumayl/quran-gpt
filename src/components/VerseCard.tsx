@@ -5,9 +5,7 @@
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React, { type FC } from 'react'
-import { getServerAuthSession } from '~/server/auth';
 import { api } from '~/utils/api';
-import Image from 'next/image';
 
 
 interface VerseCardProps {
@@ -60,7 +58,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
             ) 
           : (<></>)
         }
-        <div className="font-zilla-slab-italic text-slate-500" key={`surahverse_${surah}_${verse}`}>— {dbFetch.data?.surahName}, {verse} —</div>
+        <div className="font-zilla-slab-italic text-emerald-500" key={`surahverse_${surah}_${verse}`}>— {dbFetch.data?.surahName}, {verse} —</div>
         <br></br>
         <div className="font-lateef text-3xl text-slate-600">{dbFetch.data?.verseText}</div>
         <br></br>

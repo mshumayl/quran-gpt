@@ -1,14 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
-import { GetSessionParams, signIn, signOut, useSession } from "next-auth/react";
-
-import { api } from "~/utils/api";
-import PromptInput from "~/components/PromptInput";
-
-
-import { getSession } from "next-auth/react"
+import { getSession, type GetSessionParams } from "next-auth/react";
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
 import VerseCard from "~/components/VerseCard";
@@ -50,7 +43,7 @@ const Main: NextPage = () => {
       <Head>
         <title>AI-Daleel</title>
         <meta name="description" content="AI-powered al-Quran daleel search" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen items-center bg-slate-100">
         <NavBar/><MobileNavBar/>

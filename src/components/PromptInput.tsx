@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import router from 'next/router';
 import React, { useEffect, useState, type FC, type FormEvent  } from 'react'
 import { api } from '~/utils/api';
 // import VerseCard from './VerseCard';
@@ -88,8 +87,14 @@ const PromptInput: FC = ({  }) => {
               }}>
               </textarea>
               <div className="text-end mx-2 my-1 text-xs text-slate-400">{inputLength}/{maxInputLength}</div>
-              <button type="submit" className="m-10 p-2 flex flex-col items-center bg-slate-300 rounded-lg border border-dashed border-slate-400 
-              hover:bg-slate-200 active:bg-slate-400 text-sm font-zilla-slab-italic">
+              <button type="submit" className="transition-all m-10 p-2 flex flex-col items-center bg-emerald-400 
+              rounded-lg border border-dashed border-emerald-600 
+              hover:bg-emerald-300 active:bg-emerald-200 text-sm 
+              shadow-lg translate-x-1 -translate-y-1 
+              hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-md
+              active:translate-x-0 active:-translate-y-0 active:shadow-inner
+              text-white
+              font-zilla-slab-italic">
                   Submit
               </button>
         </form>

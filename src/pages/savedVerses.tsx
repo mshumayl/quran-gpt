@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import { GetSessionParams, signIn, signOut, useSession } from "next-auth/react";
+import { type GetSessionParams, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
-import PromptInput from "~/components/PromptInput";
-
-
 import { getSession } from "next-auth/react"
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
@@ -49,7 +45,7 @@ const Bookmarks = () => {
     }
 
     if (fetchSavedVerses && fetchSavedVerses.data && fetchSavedVerses.data.userSavedSnippets.length > 0) {
-      savedVerses = fetchSavedVerses.data.userSavedSnippets.map((v) => {
+      savedVerses = fetchSavedVerses.data.userSavedSnippets.map((v: { verseId: string }) => {
         const surah = v.verseId.split("_")[0]
         const verse = v.verseId.split("_")[1]
 
@@ -66,7 +62,7 @@ const Bookmarks = () => {
           <Head>
             <title>Saved Verses</title>
             <meta name="description" content="AI-powered al-Quran daleel search" />
-            <link rel="icon" href="/favicon.ico" />
+            <link rel="icon" href="/ai-daleel.ico" />
           </Head>
           <main className="flex flex-col items-center bg-slate-100">
             <NavBar/><MobileNavBar/>
