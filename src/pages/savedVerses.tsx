@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Head from "next/head";
-import Link from "next/link";
 import { type GetSessionParams, useSession } from "next-auth/react";
 
 import { api } from "~/utils/api";
@@ -41,7 +40,8 @@ const Bookmarks = () => {
     let fetchSavedVerses
     let savedVerses: savedType
 
-    if (sessionData) {
+    //TODO: Prevent this line from running unless on page load. Consider stuffing into gSSP.
+    if (sessionData !== null) {
       fetchSavedVerses = api.db.fetchUserSavedSnippets.useQuery({ userId: sessionData.user.id })
     }
 
@@ -76,9 +76,9 @@ const Bookmarks = () => {
               <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max space-y-10 mt-5 overflow-visible md:items-center md:align-top">
                  {(savedVerses && savedVerses.map && savedVerses.map(({ surah, verse, uid }) => {
                   return ((surah !== undefined && verse !== undefined) ? 
-                    (<Link key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`} className="flex flex-col items-center w-full h-max md:break-inside-avoid">
+                    (
                       <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid}/>
-                    </Link>)
+                    )
                     : (<div className="flex flex-col items-center text-center font-zilla-slab-italic">You have no saved verses.</div>)
                   )
                  })) 

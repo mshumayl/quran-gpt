@@ -54,7 +54,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
   
   return ((dbFetch.data) ? (
     <>
-      <div className={`bg-slate-200 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")}`}>
+      <div className={`bg-slate-200 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")} md:break-inside-avoid`}>
         {
           (isDetailed && dbFetchDetails) //Renders only in verse/ endpoint
           ? (
@@ -75,7 +75,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
           (uid) //Renders only in /savedVerses (uid prop is only passed in savedVerses.tsx)
           ? (
           <>
-            <div className="z-40 -mt-6 -mr-6 mb-5 sm:-m-2 flex justify-end cursor-pointer" onClick={handleDelete}>
+            <div className="-mt-6 -mr-6 mb-5 sm:-m-2 flex justify-end cursor-pointer" onClick={handleDelete}>
               <svg className="h-7 w-7 fill-slate-300 stroke-slate-400 hover:fill-slate-400 hover:stroke-slate-500 transition-all" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m3 3 1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 0 1 1.743-1.342 48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664 19.5 19.5"/></svg>
             </div>
           </>
@@ -100,6 +100,20 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
               </div>
             </>
           ) 
+          : (<></>)
+        }
+
+        {
+          (uid) //Renders navigation button only in /savedVerses (uid prop is only passed in savedVerses.tsx)
+          ? (
+          <>
+            <Link className="mt-6 -mb-2 w-full self-end md:w-1/3 flex flex-col items-center transition-all
+             font-zilla-slab-italic text-slate-500 rounded-lg shadow-inner
+            bg-slate-300 hover:bg-slate-400" key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`}>
+              Details
+            </Link>
+          </>
+          )
           : (<></>)
         }
       </div>
