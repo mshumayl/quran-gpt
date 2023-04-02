@@ -31,7 +31,8 @@ export async function getServerSideProps(context: GetSessionParams | undefined) 
 const Bookmarks = () => {
     type savedType = {
         "surah"?: string,
-        "verse"?: string
+        "verse"?: string,
+        "uid"?:   string,
     }[] | undefined
       
 
@@ -45,13 +46,15 @@ const Bookmarks = () => {
     }
 
     if (fetchSavedVerses && fetchSavedVerses.data && fetchSavedVerses.data.userSavedSnippets.length > 0) {
-      savedVerses = fetchSavedVerses.data.userSavedSnippets.map((v: { verseId: string }) => {
+      savedVerses = fetchSavedVerses.data.userSavedSnippets.map((v: { verseId: string, id: string }) => {
         const surah = v.verseId.split("_")[0]
         const verse = v.verseId.split("_")[1]
+        const uid = v.id
 
         return {
           surah: surah,
-          verse: verse
+          verse: verse,
+          uid: uid
         }
       })
     }

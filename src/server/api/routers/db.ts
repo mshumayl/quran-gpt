@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { useSession } from 'next-auth/react';
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { z } from "zod";
-import { env } from "~/env.mjs";
 import { PrismaClient } from '@prisma/client'
 
 import {
@@ -13,7 +11,6 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { getServerAuthSession } from "~/server/auth";
 
 export const dbRouter = createTRPCRouter({
   fetchVerse: publicProcedure
@@ -110,6 +107,28 @@ export const dbRouter = createTRPCRouter({
         }
     }),
 
+    removeSnippet: protectedProcedure
+    .input(z.object( { verseId: z.string(), userId: z.string(), id: z.string() } ))
+    .mutation(async ( { input } ) => {
+        
+        //TODO: Shutdown connection after query
+        const prisma = new PrismaClient();
+
+        //Using deleteMany instead of delete to check all params for extra safety
+        const deleteSnippet = await prisma.savedSnippets.deleteMany({
+            where: {
+                AND: {
+                    id: input.id,
+                    verseId: input.verseId,
+                    userId: input.userId
+                },
+            },
+        })
+
+        console.log(deleteSnippet)
+        return (`Bookmark removed.`)
+    }),
+
     fetchUserSavedSnippets: protectedProcedure
     .input(z.object( { userId: z.string() } ))
     .query(async ( {input} ) => {
@@ -122,10 +141,10 @@ export const dbRouter = createTRPCRouter({
             },
             select: {
                 verseId: true,
+                id: true,
             }
         })
         console.log(userSavedSnippets)
         return ({ userSavedSnippets })
-
-    })
+    }),
 });
