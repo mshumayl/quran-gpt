@@ -12,9 +12,10 @@ interface VerseCardProps {
   surah: number;
   verse: number;
   isDetailed?: boolean;
+  uid?: string; //Unique ID for table savedSnippets in db. Only available for saved snippets.
 }
 
-const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
+const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
   
   const { data: session } = useSession();
 
@@ -26,6 +27,18 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
       console.log(saveRes);
     } else {
       console.log("Unable to save. Please log in.")
+    }
+  }
+
+  const deleteApi = api.db.removeSnippet.useMutation();
+  const handleDelete = async () => {
+    console.log("Clicked Delete");
+
+    if (session && uid) {
+      const deleteRes = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
+      console.log(deleteRes);
+    } else {
+      console.log("Unable to delete. Please log in.")
     }
   }
 
@@ -56,6 +69,17 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed }) => {
             </div>
           </>
             ) 
+          : (<></>)
+        }
+        {
+          (uid) //Renders only in /savedVerses (uid prop is only passed in savedVerses.tsx)
+          ? (
+          <>
+            <div className="z-40 -mt-6 -mr-6 mb-5 sm:-m-2 flex justify-end cursor-pointer" onClick={handleDelete}>
+              <svg className="h-7 w-7 fill-slate-300 stroke-slate-400 hover:fill-slate-400 hover:stroke-slate-500 transition-all" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m3 3 1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 0 1 1.743-1.342 48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664 19.5 19.5"/></svg>
+            </div>
+          </>
+          )
           : (<></>)
         }
         <div className="font-zilla-slab-italic text-emerald-500" key={`surahverse_${surah}_${verse}`}>— {dbFetch.data?.surahName}, {verse} —</div>
