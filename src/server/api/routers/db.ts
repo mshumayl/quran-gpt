@@ -101,9 +101,9 @@ export const dbRouter = createTRPCRouter({
                 },
             })
             console.log(snippet)
-            return (`Verse successfully bookmarked.`)
+            return (`SAVE_SUCCESS`)
         } else {
-            return (`This verse has been bookmarked previously.`)
+            return (`SAVE_EXISTS`)
         }
     }),
 
@@ -126,13 +126,12 @@ export const dbRouter = createTRPCRouter({
         })
 
         console.log(deleteSnippet)
-        return (`Bookmark removed.`)
+        return (`REMOVE_SUCCESSFUL`)
     }),
 
     fetchUserSavedSnippets: protectedProcedure
     .input(z.object( { userId: z.string() } ))
     .query(async ( {input} ) => {
-        console.log("In fetchUserSavedSnippets")
         const prisma = new PrismaClient();
 
         const userSavedSnippets = await prisma.savedSnippets.findMany({

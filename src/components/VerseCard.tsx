@@ -13,9 +13,10 @@ interface VerseCardProps {
   verse: number;
   isDetailed?: boolean;
   uid?: string; //Unique ID for table savedSnippets in db. Only available for saved snippets.
+  setToasterResult?:  React.Dispatch<React.SetStateAction<string>>; //Callback function to update state in parent component. Parent can be savedVerses or [surahVerse].
 }
 
-const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
+const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToasterResult }) => {
 
   type responseType = {
       surahName: string | undefined;
@@ -26,6 +27,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
   const [ fetchedData, setFetchedData ] = useState<responseType>()
   const [ loader, setLoader ] = useState(true)
 
+
   const { data: session } = useSession();
 
   const saveApi = api.db.saveSnippet.useMutation();
@@ -34,6 +36,12 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
     if (session) {
       const saveRes = await saveApi.mutateAsync({ verseId: `${surah}_${verse}`, userId: session?.user.id });
       console.log(saveRes);
+
+      //If callback function is passed as prop
+      if (setToasterResult) {
+        setToasterResult(saveRes);
+      }
+
     } else {
       console.log("Unable to save. Please log in.")
     }
@@ -46,6 +54,12 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
     if (session && uid) {
       const deleteRes = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
       console.log(deleteRes);
+
+      //If callback function is passed as prop
+      if (setToasterResult) {
+        setToasterResult(deleteRes);
+      }
+      
       setFetchedData(undefined);
       dbFetch = undefined;
     } else {
@@ -74,7 +88,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
   } 
   
   return ((fetchedData) ? (
-    <>
+    <div className="flex flex-col">
       <div className={`bg-slate-200 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")} md:break-inside-avoid`}>
         {
           (isDetailed && dbFetchDetails) //Renders only in verse/ endpoint
@@ -138,7 +152,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
           : (<></>)
         }
       </div>
-    </>
+    </div>
   ) : (loader) //If fetching data on page load, display loader 
   ? (<div className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-10 rounded-lg bg-slate-200 py-1 px-2">Fetching verses...</div>)
   : (<></>))

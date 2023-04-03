@@ -9,6 +9,8 @@ import { getSession } from "next-auth/react"
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
 import VerseCard from "~/components/VerseCard";
+import Toaster from "~/components/Toaster";
+import { useState } from "react";
 
 export async function getServerSideProps(context: GetSessionParams | undefined) {
     const session = await getSession(context)
@@ -34,6 +36,7 @@ const Bookmarks = () => {
         "uid"?:   string,
     }[] | undefined
       
+    const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
 
     const { data: sessionData } = useSession();
 
@@ -63,7 +66,7 @@ const Bookmarks = () => {
     return (
         <>
           <Head>
-            <title>Saved Verses</title>
+            <title>Bookmarks | AI-Daleel</title>
             <meta name="description" content="AI-powered al-Quran daleel search" />
             <link rel="icon" href="/ai-daleel.ico" />
           </Head>
@@ -71,13 +74,13 @@ const Bookmarks = () => {
             <NavBar/><MobileNavBar/>
             <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
               <div className="font-zilla-slab-italic text-3xl md:text-6xl">
-                Saved Verses
+                Bookmarked Verses
               </div>
               <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max space-y-10 mt-5 overflow-visible md:items-center md:align-top">
                  {(savedVerses && savedVerses.map && savedVerses.map(({ surah, verse, uid }) => {
                   return ((surah !== undefined && verse !== undefined) ? 
                     (
-                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid}/>
+                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid} setToasterResult={setBookmarkResult}/>
                     )
                     : (<></>)
                   )
@@ -90,7 +93,9 @@ const Bookmarks = () => {
                   <Link href="/main" className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic text-slate-600 hover:text-emerald-500">Search verses</Link>
                 </>) 
               : (<></>)}
-              <div></div>
+              <div className="z-50">
+                <Toaster status={bookmarkResult}/>
+              </div>
             </div>
           </main>
         </>

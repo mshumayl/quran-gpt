@@ -5,7 +5,9 @@ import { getSession, type GetSessionParams } from "next-auth/react";
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
 import VerseCard from "~/components/VerseCard";
+import Toaster from "~/components/Toaster";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 //TODO: Use getStaticProps to get verse data
 
@@ -29,6 +31,17 @@ export async function getServerSideProps(context: GetSessionParams | undefined) 
 const Main: NextPage = () => {
   const { query } = useRouter();
 
+  const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
+
+  useEffect(() => {
+    if (bookmarkResult !== "") {
+      const timeout = setTimeout(() => {
+        setBookmarkResult("")
+      }, 2000)
+      return () => clearTimeout(timeout)
+    }
+  }, [bookmarkResult])
+
   let surah = null;
   let verse = null;
 
@@ -41,7 +54,7 @@ const Main: NextPage = () => {
   return (
     <>
       <Head>
-        <title>AI-Daleel</title>
+        <title>Verse Details | AI-Daleel</title>
         <meta name="description" content="AI-powered al-Quran daleel search" />
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
@@ -52,8 +65,11 @@ const Main: NextPage = () => {
             Verse Details
           </div>
           <div className="mt-2 md:p-10 w-full md:w-7/8 flex flex-col items-center">
-            {(surah && verse) ? (<VerseCard surah={parseInt(surah)} verse={parseInt(verse)} isDetailed={true}/>) : (<>No</>)} 
+            {(surah && verse) ? (<VerseCard surah={parseInt(surah)} verse={parseInt(verse)} isDetailed={true} setToasterResult={setBookmarkResult}/>) : (<>No</>)} 
           </div>
+        </div>
+        <div className="z-50">
+          <Toaster status={bookmarkResult}/>
         </div>
       </main>
     </>
