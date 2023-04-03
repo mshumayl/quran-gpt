@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Head from "next/head";
 import { type GetSessionParams, useSession } from "next-auth/react";
-
+import Link from "next/link";
 import { api } from "~/utils/api";
 import { getSession } from "next-auth/react"
 import NavBar from "~/components/NavBar";
@@ -67,7 +67,7 @@ const Bookmarks = () => {
             <meta name="description" content="AI-powered al-Quran daleel search" />
             <link rel="icon" href="/ai-daleel.ico" />
           </Head>
-          <main className="flex flex-col items-center bg-slate-100">
+          <main className="flex flex-col items-center min-h-screen bg-slate-100">
             <NavBar/><MobileNavBar/>
             <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
               <div className="font-zilla-slab-italic text-3xl md:text-6xl">
@@ -79,11 +79,18 @@ const Bookmarks = () => {
                     (
                       <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid}/>
                     )
-                    : (<div className="flex flex-col items-center text-center font-zilla-slab-italic">You have no saved verses.</div>)
+                    : (<></>)
                   )
-                 })) 
-                 }
+                 })
+                 )}
               </div>
+              {(fetchSavedVerses?.data?.userSavedSnippets.length === 0) 
+              ? (<>
+                  <div className="font-zilla-slab-italic text-slate-700">You have no saved verses.</div>
+                  <Link href="/main" className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic text-slate-600 hover:text-emerald-500">Search verses</Link>
+                </>) 
+              : (<></>)}
+              <div></div>
             </div>
           </main>
         </>

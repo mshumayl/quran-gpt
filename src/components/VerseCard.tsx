@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { type FC } from 'react'
+import React, { useState, type FC, useEffect } from 'react'
 import { api } from '~/utils/api';
 
 
@@ -16,7 +16,16 @@ interface VerseCardProps {
 }
 
 const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
-  
+
+  type responseType = {
+      surahName: string | undefined;
+      verseText: string | undefined;
+      verseTranslation: string | null | undefined;
+  } | undefined
+
+  const [ fetchedData, setFetchedData ] = useState<responseType>()
+  const [ loader, setLoader ] = useState(true)
+
   const { data: session } = useSession();
 
   const saveApi = api.db.saveSnippet.useMutation();
@@ -37,13 +46,25 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
     if (session && uid) {
       const deleteRes = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
       console.log(deleteRes);
+      setFetchedData(undefined);
+      dbFetch = undefined;
     } else {
       console.log("Unable to delete. Please log in.")
     }
   }
 
-  //make tRPC calls to fetch surahName and verse here
-  const dbFetch = api.db.fetchVerse.useQuery({surahNumber: surah.toString(), verseNumber: verse.toString()})
+  let dbFetch = api.db.fetchVerse.useQuery({surahNumber: surah.toString(), verseNumber: verse.toString()}).data
+
+  //Store response in state so that the state can be cleared and re-rendered dynamically when user removes a bookmark
+  useEffect(() => {
+    if (dbFetch !== undefined) {
+      //This only runs during page load
+      setFetchedData(dbFetch)
+      setLoader(false);
+    }
+  }, [dbFetch])
+
+
   let dbFetchDetails = null
   //query detailed metadata separately
   if (isDetailed) {
@@ -52,7 +73,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
     console.log(dbFetchDetails.data)
   } 
   
-  return ((dbFetch.data) ? (
+  return ((fetchedData) ? (
     <>
       <div className={`bg-slate-200 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")} md:break-inside-avoid`}>
         {
@@ -82,11 +103,11 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
           )
           : (<></>)
         }
-        <div className="font-zilla-slab-italic text-emerald-500" key={`surahverse_${surah}_${verse}`}>— {dbFetch.data?.surahName}, {verse} —</div>
+        <div className="font-zilla-slab-italic text-emerald-500" key={`surahverse_${surah}_${verse}`}>— {fetchedData?.surahName}, {verse} —</div>
         <br></br>
-        <div className="font-lateef text-3xl text-slate-600">{dbFetch.data?.verseText}</div>
+        <div className="font-lateef text-3xl text-slate-600">{fetchedData?.verseText}</div>
         <br></br>
-        <div className="font-zilla-slab-italic text-lg text-slate-500">{dbFetch.data?.verseTranslation}</div>
+        <div className="font-zilla-slab-italic text-lg text-slate-500">{fetchedData?.verseTranslation}</div>
 
         {
           (isDetailed) //Renders only in verse/ endpoint
@@ -118,7 +139,9 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid }) => {
         }
       </div>
     </>
-  ) : (<div className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-10 rounded-lg bg-slate-200 py-1 px-2">Fetching verses...</div>))
+  ) : (loader) //If fetching data on page load, display loader 
+  ? (<div className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-10 rounded-lg bg-slate-200 py-1 px-2">Fetching verses...</div>)
+  : (<></>))
 }
 
 export default VerseCard;
