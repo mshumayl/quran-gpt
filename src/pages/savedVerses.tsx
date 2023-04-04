@@ -10,7 +10,7 @@ import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
 import VerseCard from "~/components/VerseCard";
 import Toaster from "~/components/Toaster";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export async function getServerSideProps(context: GetSessionParams | undefined) {
     const session = await getSession(context)
@@ -37,6 +37,15 @@ const Bookmarks = () => {
     }[] | undefined
       
     const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
+
+    useEffect(() => {
+      if (bookmarkResult !== "") {
+        const timeout = setTimeout(() => {
+          setBookmarkResult("")
+        }, 2000)
+        return () => clearTimeout(timeout)
+      }
+    }, [bookmarkResult])
 
     const { data: sessionData } = useSession();
 
