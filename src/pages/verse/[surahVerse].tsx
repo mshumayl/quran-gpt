@@ -8,6 +8,7 @@ import VerseCard from "~/components/VerseCard";
 import Toaster from "~/components/Toaster";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Notes from "~/components/Notes";
 
 //TODO: Use getStaticProps to get verse data
 
@@ -67,6 +68,9 @@ const Main: NextPage = () => {
           <div className="mt-2 md:p-10 w-full md:w-7/8 flex flex-col items-center">
             {(surah && verse) ? (<VerseCard surah={parseInt(surah)} verse={parseInt(verse)} isDetailed={true} setToasterResult={setBookmarkResult}/>) : (<>No</>)} 
           </div>
+        </div>
+        <div>
+          <Notes/>
         </div>
         <div className="z-50">
           <Toaster status={bookmarkResult}/>
