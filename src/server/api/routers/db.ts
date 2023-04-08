@@ -130,8 +130,8 @@ export const dbRouter = createTRPCRouter({
     }),
 
     fetchUserSavedSnippets: protectedProcedure
-    .input(z.object( { userId: z.string() } ))
-    .query(async ( {input} ) => {
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
         const prisma = new PrismaClient();
 
         const userSavedSnippets = await prisma.savedSnippets.findMany({
@@ -146,4 +146,30 @@ export const dbRouter = createTRPCRouter({
         console.log(userSavedSnippets)
         return ({ userSavedSnippets })
     }),
+
+    checkIsSnippetSaved: protectedProcedure
+    .input(z.object({ userId: z.string(), verseId: z.string() }))
+    .query( async ({ input }) => {
+        console.log("Check")
+
+        const prisma = new PrismaClient();
+
+        const snippet = await prisma.savedSnippets.findMany({ 
+            where: {
+                AND: {
+                    userId: input.userId, 
+                    verseId: input.verseId
+                }
+            },
+            select: {
+                id: true
+            }
+         })
+
+         if (snippet.length>0) {
+            return true
+         } else {
+            return false
+         }
+    }) 
 });
