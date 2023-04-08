@@ -69,8 +69,10 @@ const Main: NextPage = () => {
             {(surah && verse) ? (<VerseCard surah={parseInt(surah)} verse={parseInt(verse)} isDetailed={true} setToasterResult={setBookmarkResult}/>) : (<>No</>)} 
           </div>
         </div>
-        <div>
-          <Notes/>
+        <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
+          <div className="-mt-14 md:p-10 w-full md:w-7/8 flex flex-col items-center bg-red-200">
+            <Notes/>
+          </div>
         </div>
         <div className="z-50">
           <Toaster status={bookmarkResult}/>
