@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { type NextPage } from "next";
 import Head from "next/head";
-import { getSession, type GetSessionParams } from "next-auth/react";
+import { getSession, useSession, type GetSessionParams } from "next-auth/react";
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
 import VerseCard from "~/components/VerseCard";
@@ -33,6 +33,9 @@ const Main: NextPage = () => {
   const { query } = useRouter();
 
   const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
+  const { data: session } = useSession();
+
+
 
   useEffect(() => {
     if (bookmarkResult !== "") {
@@ -45,9 +48,19 @@ const Main: NextPage = () => {
 
   let surah = null;
   let verse = null;
+  let verseId = "";
+  let userId = "";
 
   if (typeof query.surahVerse === "string") {
     [ surah, verse ] = query.surahVerse.split("_");
+
+    if (query.surahVerse) {
+      verseId = query.surahVerse
+    }
+  }
+
+  if (session && session.user.id) {
+    userId = session.user.id
   }
 
   //TODO: Add more metadata here 
@@ -70,8 +83,8 @@ const Main: NextPage = () => {
           </div>
         </div>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
-          <div className="-mt-14 md:p-10 w-full md:w-7/8 flex flex-col items-center bg-red-200">
-            <Notes/>
+          <div className="-mt-14 md:p-10 w-full md:w-7/8   flex flex-col items-center bg-red-200">
+            <Notes verseId={verseId} userId={userId} />
           </div>
         </div>
         <div className="z-50">

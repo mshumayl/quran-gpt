@@ -147,7 +147,7 @@ export const dbRouter = createTRPCRouter({
         return ({ userSavedSnippets })
     }),
 
-    checkIsSnippetSaved: protectedProcedure
+    getSnippetId: protectedProcedure
     .input(z.object({ userId: z.string(), verseId: z.string() }))
     .query( async ({ input }) => {
         console.log("Check")
@@ -166,10 +166,6 @@ export const dbRouter = createTRPCRouter({
             }
          })
 
-         if (snippet.length>0) {
-            return true
-         } else {
-            return false
-         }
+         return snippet
     }) 
 });

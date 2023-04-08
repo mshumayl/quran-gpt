@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { useSession } from 'next-auth/react';
 import React, { useState, type FC, useEffect } from 'react'
+import { api } from '~/utils/api';
 
 interface NotesProps {
-    notes?: string;
+    userId: string;
+    verseId: string;
 }
 
 const SubmitNoteButton: FC = ({  }) => {
@@ -14,8 +18,7 @@ const SubmitNoteButton: FC = ({  }) => {
   )
 }
 
-const Notes: FC<NotesProps> = ({ notes }) => {
-  const { data: sessionData } = useSession();
+const Notes: FC<NotesProps> = ({ userId, verseId }) => {
 
   type savedNoteType = {
     note: string,
@@ -25,15 +28,24 @@ const Notes: FC<NotesProps> = ({ notes }) => {
   const [ savedNoteValue, setSavedNoteValue ] = useState<savedNoteType>([{note: "", saveTime: ""}]);
   const [ newNoteValue, setNewNoteValue ] = useState(""); //This is used to decide whether or not to render submit button
   
+  const snippetId = api.db.getSnippetId.useQuery({ userId: userId, verseId: verseId  }).data
   //This useEffect runs on page load. A function will useQuery to get all saved notes.
   //If result set is not empty, update savedNoteValue with result set.
   //The dependency array is empty [] to only run on page load.
   useEffect(() => {
     console.log("useEffect for page load")
     console.log("Fetch saved verse from db")
-    console.log("If saved verse not empty, setSavedNoteValue")
-    //setSavedNoteValue
-  }, [])
+    
+
+    if (snippetId && snippetId.length != 0) {
+      console.log("Saved verse exists in table.")
+      console.log(snippetId)
+      
+      //HERE: Query saved notes for id = snippetId. 
+      
+      //HERE: setSavedNoteValue to the above result. Need to parse.
+    }
+  }, [snippetId])
 
   return (
     <div className="w-full min-h-screen">
