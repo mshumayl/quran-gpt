@@ -83,6 +83,7 @@ model Verses {
     verseNumber         String
     surahNumber         String
 }
+
 //One-to-many, Users-SavedSnippets
 //We are not relating directly to Verses to avoid a many-to-many relationship
 model SavedSnippets {
@@ -90,4 +91,16 @@ model SavedSnippets {
     userId              String   
     user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
     verseId             String
+    userNotes           UserNotes[]
+}
+
+//Many-to-one, UserNotes-SavedSnippets
+//If a SavedSnippets row gets deleted, all related UserNotes are deleted
+model UserNotes {
+    id                  String @id @default(cuid())
+    snippetId           String
+    savedSnippets       SavedSnippets @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+    content             String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
