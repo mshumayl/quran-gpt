@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { z } from "zod";
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../db'
 
 import {
   createTRPCRouter,
@@ -19,9 +19,6 @@ export const dbRouter = createTRPCRouter({
         
         const { surahNumber, verseNumber } = input;
         const id = `${surahNumber}_${verseNumber}`
-
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
 
         const querySurahName = await prisma.surahMetadata.findUnique({
             where: { 
@@ -55,9 +52,6 @@ export const dbRouter = createTRPCRouter({
         
         const { surahNumber } = input;
 
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
-
         const querySurahMetadata = await prisma.surahMetadata.findUnique({
             where: { 
                 id: surahNumber
@@ -81,9 +75,6 @@ export const dbRouter = createTRPCRouter({
     saveSnippet: protectedProcedure
     .input(z.object( { verseId: z.string(), userId: z.string() } ))
     .mutation(async ( { input } ) => {
-
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
 
         //TODO: Check if there exists a previous save
         const existingSave = await prisma.savedSnippets.findMany({
@@ -111,9 +102,6 @@ export const dbRouter = createTRPCRouter({
     .input(z.object( { verseId: z.string(), userId: z.string(), id: z.string() } ))
     .mutation(async ( { input } ) => {
         
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
-
         //Using deleteMany instead of delete to check all params for extra safety
         const deleteSnippet = await prisma.savedSnippets.deleteMany({
             where: {
@@ -132,7 +120,6 @@ export const dbRouter = createTRPCRouter({
     fetchUserSavedSnippets: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input }) => {
-        const prisma = new PrismaClient();
 
         const userSavedSnippets = await prisma.savedSnippets.findMany({
             where: { 
@@ -150,9 +137,6 @@ export const dbRouter = createTRPCRouter({
     getSnippetId: protectedProcedure
     .input(z.object({ userId: z.string(), verseId: z.string() }))
     .query( async ({ input }) => {
-        console.log("Check")
-
-        const prisma = new PrismaClient();
 
         const snippet = await prisma.savedSnippets.findMany({ 
             where: {
@@ -166,6 +150,7 @@ export const dbRouter = createTRPCRouter({
             }
          })
 
+         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
          return snippet
     }) 
 });
