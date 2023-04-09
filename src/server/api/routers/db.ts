@@ -152,5 +152,42 @@ export const dbRouter = createTRPCRouter({
 
          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
          return snippet
-    }) 
+    }),
+
+    addNote: protectedProcedure
+    .input(z.object({ snippetId: z.string(), userId: z.string(), content: z.string() }))
+    .mutation(async ({ input }) => {
+        //Response type -- to make it easier and more standardized for client to parse.
+        type addNoteRespT = {
+            result: string
+        }
+
+        let addNoteResp: addNoteRespT;
+
+        //Check if the snippetId belongs to the userId.
+        const snippet = await prisma.savedSnippets.findUnique({ 
+            where: {
+                id: input.snippetId
+            },
+            select: {
+                userId: true
+            }
+         })
+
+        if (snippet?.userId === input.userId) {
+            //Insert into Notes
+            const note = await prisma.userNotes.create({
+                data: {
+                    snippetId: input.snippetId,
+                    content: input.content
+                },
+            })
+            console.log("Inserted into UserNotes: ", note)
+            addNoteResp = { result: "ADD_NOTE_SUCCESS" };
+        } else {
+            addNoteResp = { result: "USER_UNAUTHORIZED" };
+        }
+        
+        return addNoteResp
+    })
 });
