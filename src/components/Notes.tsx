@@ -14,6 +14,7 @@ interface SubmitNoteButtonProps {
     newNoteValue: string;
     userId: string;
     snippetId: string;
+    verseId: string;
 }
 
 type savedNoteType = {
@@ -21,7 +22,7 @@ type savedNoteType = {
   saveTime?: string
 }[]
 
-const SubmitNoteButton: FC<SubmitNoteButtonProps> = ({ setSavedNoteValue, newNoteValue, userId, snippetId }) => {
+const SubmitNoteButton: FC<SubmitNoteButtonProps> = ({ setSavedNoteValue, newNoteValue, userId, snippetId, verseId }) => {
 
   const submitNoteApi = api.db.addNote.useMutation();
 
@@ -32,7 +33,8 @@ const SubmitNoteButton: FC<SubmitNoteButtonProps> = ({ setSavedNoteValue, newNot
     //Send newNoteValue to addNote API (which is possible as the procedure can defined first before running mutateAsync.)
     const res = await submitNoteApi.mutateAsync({ 
       userId: userId, 
-      snippetId: snippetId, 
+      snippetId: snippetId,
+      verseId: verseId, 
       content: newNoteValue 
     });
 
@@ -96,7 +98,8 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
           setSavedNoteValue={setSavedNoteValue} 
           newNoteValue={newNoteValue} 
           userId={userId} 
-          snippetId={snippetId}/>) 
+          snippetId={snippetId}
+          verseId={verseId}/>) 
           : (<></>)}
         </div>
     </div>

@@ -12,6 +12,11 @@ import {
   protectedProcedure,
 } from "~/server/api/trpc";
 
+//Response type -- to make it easier and more standardized for client to parse.
+type RespT = {
+    result: string;
+}
+
 export const dbRouter = createTRPCRouter({
   fetchVerse: publicProcedure
     .input(z.object({ surahNumber: z.string(), verseNumber: z.string() }))
@@ -154,20 +159,85 @@ export const dbRouter = createTRPCRouter({
          return snippet
     }),
 
-    addNote: protectedProcedure
-    .input(z.object({ snippetId: z.string(), userId: z.string(), content: z.string() }))
-    .mutation(async ({ input }) => {
-        //Response type -- to make it easier and more standardized for client to parse.
-        type addNoteRespT = {
-            result: string
+    //Practically the same with getSnippetId. Use this for future use cases, and retire getSnippetId.
+    isVerseSaved: protectedProcedure
+    .input(z.object({ userId: z.string(), verseId: z.string() }))
+    .query(async ({ input }) => {
+
+        interface IIsVerseSavedResp extends RespT {
+            savedVerseUid: string | undefined;
+        }
+        
+        let response: IIsVerseSavedResp
+        
+        const dbRes = await prisma.savedSnippets.findMany({
+            where: {
+                AND: {
+                    userId: input.userId,
+                    verseId: input.verseId
+                }
+            },
+            select: {
+                id: true
+            }
+        })
+
+        if (dbRes.length === 1) {
+           response = { result: "SAVED_VERSE_EXISTS", savedVerseUid: dbRes[0]?.id }
+        } else if (dbRes.length > 1) {
+            response = { result: "REDUNDANT_SAVED_VERSE", savedVerseUid: undefined }
+        } else {
+            response = { result: "VERSE_NOT_SAVED", savedVerseUid: undefined }
         }
 
-        let addNoteResp: addNoteRespT;
+        return response
+    }),
+
+    addNote: protectedProcedure
+    .input(z.object({ snippetId: z.string(), userId: z.string(), verseId: z.string(), content: z.string() }))
+    .mutation(async ({ input }) => {
+
+        let addNoteResp: RespT;
+        let snippetId = input.snippetId;
+        let savePrefix = ""; //Prefix to prepend on addNoteResp result on successful save + add note
+
+        //If snippetId is an empty string, save the snippet first.
+        //At this stage, there is a huge loophole. If a user immediately adds a second note on an auto-saved verse, the verse will re-save.
+        if (snippetId === "") {
+            //Check redundant save
+            const redundantSaveResp = await prisma.savedSnippets.findFirst({
+                where: {
+                    AND: { 
+                        userId: input.userId,
+                        verseId: input.verseId
+                    }
+                },
+                select: {
+                    id: true
+                }
+            }) 
+
+            if (redundantSaveResp === null) {
+                console.log("Verse have not been saved. Creating new save...")
+                const saveSnippetDbResp = await prisma.savedSnippets.create({
+                    data: {
+                        userId: input.userId,
+                        verseId: input.verseId
+                    },
+                })
+    
+                snippetId = saveSnippetDbResp.id
+                savePrefix = "SAVE_AND_"
+            } else {
+                console.log("Verse previously saved. Skipping to save note.")
+                snippetId = redundantSaveResp.id
+            }
+        }
 
         //Check if the snippetId belongs to the userId.
         const snippet = await prisma.savedSnippets.findUnique({ 
             where: {
-                id: input.snippetId
+                id: snippetId
             },
             select: {
                 userId: true
@@ -178,14 +248,14 @@ export const dbRouter = createTRPCRouter({
             //Insert into Notes
             const note = await prisma.userNotes.create({
                 data: {
-                    snippetId: input.snippetId,
+                    snippetId: snippetId,
                     content: input.content
                 },
             })
             console.log("Inserted into UserNotes: ", note)
-            addNoteResp = { result: "ADD_NOTE_SUCCESS" };
+            addNoteResp = { result: `${savePrefix}ADD_NOTE_SUCCESS` };
         } else {
-            addNoteResp = { result: "USER_UNAUTHORIZED" };
+            addNoteResp = { result: "USER_UNAUTHORIZED_TO_ADD_NOTE" };
         }
         
         return addNoteResp
