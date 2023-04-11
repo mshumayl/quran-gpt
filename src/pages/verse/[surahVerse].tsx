@@ -83,7 +83,7 @@ const Main: NextPage = () => {
           </div>
         </div>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
-          <div className="-mt-14 md:p-10 w-full md:w-7/8   flex flex-col items-center bg-red-200">
+          <div className="-mt-14 md:p-10 w-full md:w-7/8   flex flex-col items-center">
             <Notes verseId={verseId} userId={userId} />
           </div>
         </div>
