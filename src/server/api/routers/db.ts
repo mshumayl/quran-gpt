@@ -195,7 +195,7 @@ export const dbRouter = createTRPCRouter({
 
     getNotes: protectedProcedure
     .input(z.object({ snippetId: z.string(), userId: z.string() }))
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
         
         interface getNoteRespT extends RespT {
             data?: {
@@ -208,12 +208,11 @@ export const dbRouter = createTRPCRouter({
 
         if (ctx.session.user.id !== input.userId) {
             response = { result: "USER_NOT_AUTHORIZED" };
+            return response
         } else {
             const dbRes = await prisma.userNotes.findMany({
                 where: {
-                    AND: {
-                        snippetId: input.snippetId
-                    }
+                    snippetId: input.snippetId
                 }, 
                 select: {
                     content: true,
@@ -221,14 +220,14 @@ export const dbRouter = createTRPCRouter({
                 }
             })
 
-            if ( dbRes.length>0 ) {
+            if ( dbRes.length === 0 ) {
                 response = { result: "NO_SAVED_NOTES" }
+                return response
             } else {
                 response = { result: "NOTES_RETRIEVED", data: dbRes }
+                return response
             }
         }
-
-        return response
     }),
 
     addNote: protectedProcedure

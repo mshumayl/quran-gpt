@@ -37,23 +37,31 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
     snippetId = snippet[0]?.id ?? ""; //Assign to "" if indexed array is undefined
   }
 
+  const getNotesApi = api.db.getNotes.useMutation()
+  
   //This useEffect runs on page load. A function will useQuery to get all saved notes.
   //If result set is not empty, update savedNoteValue with result set.
-  //The dependency array is empty [] to only run on page load.
   useEffect(() => {
-    console.log("useEffect for page load")
-    console.log("Fetch saved verse from db")
-    
 
-    if (snippet && snippet.length != 0) {
-      console.log("Saved verse exists in table.")
-      console.log(snippet)
+    //This async function is required as await can only be run inside an async function, but useEffect cannot be async.
+    async function getNotesFetcher() {
+      const dbNotes = await getNotesApi.mutateAsync({ userId: userId, snippetId: snippetId })
       
-      //HERE: Query saved notes for id = snippetId. 
-      
-      //HERE: setSavedNoteValue to the above result. Need to parse.
+      if ( dbNotes?.result === "NOTES_RETRIEVED" ) {
+          const contents = dbNotes?.data?.map(({content}) => {
+            return { note: content }
+          })
+
+          if (contents !== undefined) {
+            setSavedNoteValue(contents)
+          }
+      }
     }
-  }, [snippet])
+
+    void getNotesFetcher();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [snippetId])
 
 
   const submitNoteApi = api.db.addNote.useMutation();
@@ -64,7 +72,13 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
     
     //Append newNoteValue to savedNoteValue array
     setSavedNoteValue(previous => [...previous, {note: newNoteValue}])
-    console.log("setSavedNoteValue")
+
+    if (newNoteRef.current !== null) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      newNoteRef.current.reset();
+      setNewNoteValue("");
+    }
+
     //Send newNoteValue to addNote API (which is possible as the procedure can defined first before running mutateAsync.)
     const res = await submitNoteApi.mutateAsync({ 
       userId: userId, 
@@ -74,12 +88,6 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
     });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     console.log("submitNoteApi response: ", res)
-
-    if (newNoteRef.current !== null) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      newNoteRef.current.reset();
-      setNewNoteValue("");
-    }
   }
 
   return (
@@ -90,7 +98,7 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
         <div className="">
           {savedNoteValue.map(({note}) => {
             if (note !== undefined) { //This is required because the first element of savedNoteValue is empty (If there is no fetch)
-              return (<div className="my-1 py-1 px-2 align-center text-sm rounded-md bg-slate-300 shadow-md border border-dashed border-slate-400 text-slate-500" key={note}>{note}</div>)
+              return (<div className="my-1 py-1 px-2 align-center text-sm rounded-md bg-slate-200 shadow-inner border border-dashed border-slate-300 text-slate-400" key={note}>{note}</div>)
             }
           })}
         </div>
