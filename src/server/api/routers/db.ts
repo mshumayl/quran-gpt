@@ -164,11 +164,11 @@ export const dbRouter = createTRPCRouter({
     .input(z.object({ userId: z.string(), verseId: z.string() }))
     .query(async ({ input }) => {
 
-        interface IIsVerseSavedResp extends RespT {
+        interface isVerseSavedRespT extends RespT {
             savedVerseUid: string | undefined;
         }
         
-        let response: IIsVerseSavedResp
+        let response: isVerseSavedRespT
         
         const dbRes = await prisma.savedSnippets.findMany({
             where: {
@@ -188,6 +188,44 @@ export const dbRouter = createTRPCRouter({
             response = { result: "REDUNDANT_SAVED_VERSE", savedVerseUid: undefined }
         } else {
             response = { result: "VERSE_NOT_SAVED", savedVerseUid: undefined }
+        }
+
+        return response
+    }),
+
+    getNotes: protectedProcedure
+    .input(z.object({ snippetId: z.string(), userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+        
+        interface getNoteRespT extends RespT {
+            data?: {
+                content: string,
+                createdAt: Date
+            }[]
+        }
+        
+        let response: getNoteRespT;
+
+        if (ctx.session.user.id !== input.userId) {
+            response = { result: "USER_NOT_AUTHORIZED" };
+        } else {
+            const dbRes = await prisma.userNotes.findMany({
+                where: {
+                    AND: {
+                        snippetId: input.snippetId
+                    }
+                }, 
+                select: {
+                    content: true,
+                    createdAt: true
+                }
+            })
+
+            if ( dbRes.length>0 ) {
+                response = { result: "NO_SAVED_NOTES" }
+            } else {
+                response = { result: "NOTES_RETRIEVED", data: dbRes }
+            }
         }
 
         return response
