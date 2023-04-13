@@ -128,11 +128,11 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
             : (<></>)}
           </div>
         </form>
-        <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max space-y-2 mt-5 overflow-visible md:items-center md:align-top ">
+        <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max mt-5 overflow-visible md:items-center md:align-top">
           {savedNoteValue.map(({ id, note, saveTime }) => {
             if (note !== undefined) { //This is required because the first element of savedNoteValue is empty (If there is no fetch)
               return (
-              <div className="break-inside-avoid flex flex-col my-1 py-2 px-3 align-center text-sm rounded-md bg-slate-200 shadow-inner border border-dashed border-slate-300 text-slate-400" key={id}>
+              <div className="break-inside-avoid flex flex-col mb-2 py-2 px-3 align-center text-sm rounded-md bg-slate-200 shadow-inner border border-dashed border-slate-300 text-slate-400" key={id}>
                 <div>{note}</div>
                 <div className="bg-slate-100 w-fit p-0.5 -mx-1 mt-1 rounded-md text-xs text-slate-300">{saveTime?.toLocaleString("en-GB")}</div>
               </div>)

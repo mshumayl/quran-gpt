@@ -232,8 +232,37 @@ export const dbRouter = createTRPCRouter({
         }
     }),
 
-    //Add delete procedure here. Might need to tweak return value of getNotes to include noteId to be able to query the right note to delete.
-    //Also need to think about how to return the Id for newly added notes.
+    deleteNote: protectedProcedure
+    .input(z.object({ noteId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+
+        const userId = ctx.session.user.id
+        const noteId = input.noteId
+        let deleteNoteResp: RespT;
+        
+        const noteOwner = await prisma.userNotes.findUnique({
+            where: { 
+                id: noteId
+            },
+            include: {
+                savedSnippets: true
+            }
+        })
+
+        if (noteOwner && noteOwner.savedSnippets.userId === userId) {
+            const deletedNote = await prisma.userNotes.delete({
+                where: {
+                    id: noteId
+                }
+            })
+            deleteNoteResp = { result: "NOTE_DELETED" }
+        } else {
+            deleteNoteResp = { result: "USER_UNAUTHORIZED_NOT_NOTE_OWNER" }
+        }
+
+        return deleteNoteResp
+    }),
+
     addNote: protectedProcedure
     .input(z.object({ snippetId: z.string(), userId: z.string(), verseId: z.string(), content: z.string() }))
     .mutation(async ({ input }) => {
