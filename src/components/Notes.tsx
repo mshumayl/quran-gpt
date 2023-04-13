@@ -18,8 +18,8 @@ type savedNoteType = {
 const SubmitNoteButton: FC = () => {
   return (
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    <button className="w-max bg-green-200" type="submit">
-        Submit
+    <button className="m-1 w-16 mr-2 bg-emerald-300 hover:bg-emerald-400 border border-dashed border-emerald-600 transition-all grid justify-items-center items-center rounded-md " type="submit">
+        <svg className="w-5 stroke-white stroke-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" ><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
     </button>
   )
 }
@@ -109,32 +109,83 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
     void getNotesFetcher();
   }
 
+  const deleteNoteApi = api.db.deleteNote.useMutation();
+
+  const handleDeleteNote = async (event: React.MouseEvent<HTMLElement>) => {
+
+    const eventTarget = event.target as HTMLElement;
+
+    //WARNING: This needs to be changed if the structure of the notes card changes in any way. Good thing to add to a test module.
+    const noteId = eventTarget?.parentElement?.parentElement?.parentElement?.id
+
+    //Related to getNotesFetcher, we can manually remove the selected element from the savedNoteValue array.
+    //This gives the impression of a faster feedback to the user.
+    setSavedNoteValue((current) =>
+      current.filter((element) => element.id !== noteId)
+    );
+
+    if (noteId) {
+      const res = await deleteNoteApi.mutateAsync({ noteId: noteId })
+      console.log(res)
+    } else {
+      console.log("noteId not found")
+    }
+
+    //This async function is required as await can only be run inside an async function, but useEffect cannot be async.
+    //This is the exact same function used in the useEffect above. It is used here to refetch the content with date and ID.
+    //The tweak here is that we pass an else clause if result is "NO_SAVED_NOTES", as we want to also re-render if all notes have been deleted.
+    async function getNotesFetcher() {
+      const dbNotes = await getNotesApi.mutateAsync({ userId: userId, snippetId: snippetId })
+      
+      if ( dbNotes?.result === "NOTES_RETRIEVED" ) {
+          const contents = dbNotes?.data?.map(({ id, content, createdAt }) => {
+            return { id: id, note: content, saveTime: createdAt }
+          })
+
+          if (contents !== undefined) {
+            setSavedNoteValue(contents)
+          }
+
+      } else if ( dbNotes?.result === "NO_SAVED_NOTES") {
+        setSavedNoteValue([{}])
+      }
+    }
+
+    void getNotesFetcher();
+
+  }
+
   return (
     <div className="w-full min-h-screen">
         <div className="w-full min-h-fit font-zilla-slab-italic text-xl mb-2">
           My Notes
         </div>
         <form ref={newNoteRef} onSubmit={handleNewNote}>
-          <div className="w-full bg-white rounded-xl shadow-inner border border-dashed border-slate-400">
-              <textarea name="noteInput" className="m-1 p-1 appearance-none resize-none w-11/12 outline-none" placeholder={`Add note...`} onChange={(event) => {
+          <div className="w-full bg-white rounded-xl shadow-inner border border-dashed border-slate-400 items-center p-2">
+              <textarea name="noteInput" className="h-20 appearance-none resize-none w-full outline-none" placeholder={`Add note...`} onChange={(event) => {
                   setNewNoteValue(event.target.value);
                 }}>
               </textarea>
-              {/* <div className="bg-slate-200">{noteValue}</div> */}
           </div>
-          <div className="">
-            {(newNoteValue.length > 0) 
-            ? (<SubmitNoteButton/>) 
-            : (<></>)}
+          <div className="h-7 grid justify-items-end">
+              {(newNoteValue.length > 0) 
+              && (<SubmitNoteButton/>)}
           </div>
         </form>
         <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max mt-5 overflow-visible md:items-center md:align-top">
           {savedNoteValue.map(({ id, note, saveTime }) => {
             if (note !== undefined) { //This is required because the first element of savedNoteValue is empty (If there is no fetch)
               return (
-              <div className="break-inside-avoid flex flex-col mb-2 py-2 px-3 align-center text-sm rounded-md bg-slate-200 shadow-inner border border-dashed border-slate-300 text-slate-400" key={id}>
+              <div className="break-inside-avoid flex flex-col mb-2 py-2 px-3 align-center text-sm rounded-md 
+              bg-slate-200 hover:border-slate-400 hover:shadow-sm
+              shadow-inner border border-dashed border-slate-300 text-slate-500 transition-all" id={id} key={id}>
                 <div>{note}</div>
-                <div className="bg-slate-100 w-fit p-0.5 -mx-1 mt-1 rounded-md text-xs text-slate-300">{saveTime?.toLocaleString("en-GB")}</div>
+                <div className="flex flex-row items-center mt-1 justify-between">
+                  <div className="w-fit p-0.5 -mx-1 rounded-md text-xs text-slate-400 italic justify-start">{saveTime?.toLocaleString("en-GB")}</div>
+                  <div onClick={handleDeleteNote} className="hover:cursor-pointer">
+                    <svg className="w-5 h-5 stroke-slate-300 hover:stroke-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" ><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                  </div>
+                </div>
               </div>)
             }
           })}
