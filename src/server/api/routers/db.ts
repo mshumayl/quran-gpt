@@ -200,6 +200,7 @@ export const dbRouter = createTRPCRouter({
         interface getNoteRespT extends RespT {
             data?: {
                 content: string,
+                id: string,
                 createdAt: Date
             }[]
         }
@@ -215,6 +216,7 @@ export const dbRouter = createTRPCRouter({
                     snippetId: input.snippetId
                 }, 
                 select: {
+                    id: true,
                     content: true,
                     createdAt: true
                 }
@@ -230,6 +232,8 @@ export const dbRouter = createTRPCRouter({
         }
     }),
 
+    //Add delete procedure here. Might need to tweak return value of getNotes to include noteId to be able to query the right note to delete.
+    //Also need to think about how to return the Id for newly added notes.
     addNote: protectedProcedure
     .input(z.object({ snippetId: z.string(), userId: z.string(), verseId: z.string(), content: z.string() }))
     .mutation(async ({ input }) => {

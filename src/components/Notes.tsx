@@ -10,8 +10,9 @@ interface NotesProps {
 }
 
 type savedNoteType = {
+  id?: string,
   note?: string,
-  saveTime?: string
+  saveTime?: Date
 }[]
 
 const SubmitNoteButton: FC = () => {
@@ -48,8 +49,8 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
       const dbNotes = await getNotesApi.mutateAsync({ userId: userId, snippetId: snippetId })
       
       if ( dbNotes?.result === "NOTES_RETRIEVED" ) {
-          const contents = dbNotes?.data?.map(({content}) => {
-            return { note: content }
+          const contents = dbNotes?.data?.map(({ id, content, createdAt }) => {
+            return { id: id, note: content, saveTime: createdAt }
           })
 
           if (contents !== undefined) {
@@ -88,19 +89,30 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
     });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     console.log("submitNoteApi response: ", res)
+
+    //This async function is required as await can only be run inside an async function, but useEffect cannot be async.
+    //This is the exact same function used in the useEffect above. It is used here to refetch the content with date and ID.
+    async function getNotesFetcher() {
+      const dbNotes = await getNotesApi.mutateAsync({ userId: userId, snippetId: snippetId })
+      
+      if ( dbNotes?.result === "NOTES_RETRIEVED" ) {
+          const contents = dbNotes?.data?.map(({ id, content, createdAt }) => {
+            return { id: id, note: content, saveTime: createdAt }
+          })
+
+          if (contents !== undefined) {
+            setSavedNoteValue(contents)
+          }
+      }
+    }
+
+    void getNotesFetcher();
   }
 
   return (
     <div className="w-full min-h-screen">
         <div className="w-full min-h-fit font-zilla-slab-italic text-xl mb-2">
           My Notes
-        </div>
-        <div className="">
-          {savedNoteValue.map(({note}) => {
-            if (note !== undefined) { //This is required because the first element of savedNoteValue is empty (If there is no fetch)
-              return (<div className="my-1 py-1 px-2 align-center text-sm rounded-md bg-slate-200 shadow-inner border border-dashed border-slate-300 text-slate-400" key={note}>{note}</div>)
-            }
-          })}
         </div>
         <form ref={newNoteRef} onSubmit={handleNewNote}>
           <div className="w-full bg-white rounded-xl shadow-inner border border-dashed border-slate-400">
@@ -116,6 +128,17 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
             : (<></>)}
           </div>
         </form>
+        <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max space-y-2 mt-5 overflow-visible md:items-center md:align-top ">
+          {savedNoteValue.map(({ id, note, saveTime }) => {
+            if (note !== undefined) { //This is required because the first element of savedNoteValue is empty (If there is no fetch)
+              return (
+              <div className="break-inside-avoid flex flex-col my-1 py-2 px-3 align-center text-sm rounded-md bg-slate-200 shadow-inner border border-dashed border-slate-300 text-slate-400" key={id}>
+                <div>{note}</div>
+                <div className="bg-slate-100 w-fit p-0.5 -mx-1 mt-1 rounded-md text-xs text-slate-300">{saveTime?.toLocaleString("en-GB")}</div>
+              </div>)
+            }
+          })}
+        </div>
     </div>
   )
 }
