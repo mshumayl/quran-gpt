@@ -67,7 +67,8 @@ export const openAiRouter = createTRPCRouter({
         const openai = new OpenAIApi(configuration);
 
         const prompt = `Please generate a summary of the Quran Surah ${input.surahNumber}, Verse ${input.verseNumber}. 
-        Do not respond with a translation. Just summarize the context and themes of this verse. Respond in less than 140 words.`
+        Do not respond with a translation. Just summarize the context and themes of this verse. Respond in less than 140 words.
+        Do not tell me the surah and verse numbers.`
 
         if (ctx.session.user) {
             try {
