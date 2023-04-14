@@ -11,6 +11,11 @@ import {
   protectedProcedure,
 } from "~/server/api/trpc";
 
+type openAiRespT = {
+    result: string,
+    message?: string
+}
+
 export const openAiRouter = createTRPCRouter({
   submitPrompt: publicProcedure
     .input(z.object({ userPrompt: z.string() }))
@@ -45,6 +50,49 @@ export const openAiRouter = createTRPCRouter({
         } catch(e) {
             return {e}
         }
-        
     }),
+    
+    generateNote: protectedProcedure
+    .input(z.object({ surahNumber: z.string(), verseNumber: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+
+        let res: openAiRespT = {
+            result: ""
+        }
+
+        const { Configuration, OpenAIApi } = require("openai");
+        const configuration = new Configuration({
+            apiKey: env.OPENAI_SECRET_KEY,
+        })
+        const openai = new OpenAIApi(configuration);
+
+        const prompt = `Please generate a summary of the Quran Surah ${input.surahNumber}, Verse ${input.verseNumber}. 
+        Do not respond with a translation. Just summarize the context and themes of this verse. Respond in less than 140 words.`
+
+        if (ctx.session.user) {
+            try {
+                const openAiRes = await openai.createChatCompletion({
+                    model: "gpt-3.5-turbo-0301",
+                    messages: [{"role": "user", "content": prompt}]
+                })
+                const openAiMessage = await openAiRes.data.choices[0].message.content;
+
+                res = {
+                    result: "AI_RESPONSE_RECEIVED",
+                    message: openAiMessage
+                }
+            } catch (e) {
+                console.log(e)
+                res = {
+                    result: "GENERATE_NOTE_ERROR",
+                }
+            }
+        } else {
+            res = {
+                result: "USER_NOT_AUTHORIZED"
+            }
+        }
+        
+        return res
+    })
 });
