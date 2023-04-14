@@ -33,7 +33,6 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
 
   const saveApi = api.db.saveSnippet.useMutation();
   const handleSave = async () => {
-    console.log("Clicked Save");
     if (session) {
       const saveRes = await saveApi.mutateAsync({ verseId: `${surah}_${verse}`, userId: session?.user.id });
       console.log(saveRes);
@@ -50,7 +49,6 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
 
   const deleteApi = api.db.removeSnippet.useMutation();
   const handleDelete = async () => {
-    console.log("Clicked Delete");
 
     if (session && uid) {
       const deleteRes = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })

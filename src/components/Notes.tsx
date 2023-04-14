@@ -88,7 +88,7 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
       content: newNoteValue 
     });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    console.log("submitNoteApi response: ", res)
+    console.log(res)
 
     //This async function is required as await can only be run inside an async function, but useEffect cannot be async.
     //This is the exact same function used in the useEffect above. It is used here to refetch the content with date and ID.
@@ -128,7 +128,7 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
       const res = await deleteNoteApi.mutateAsync({ noteId: noteId })
       console.log(res)
     } else {
-      console.log("noteId not found")
+      console.log("Please reload and retry deleting.")
     }
 
     //This async function is required as await can only be run inside an async function, but useEffect cannot be async.

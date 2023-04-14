@@ -52,7 +52,6 @@ const PromptInput: FC = ({  }) => {
 
     setAiResponse(json);
     setDisplayLoader((prevState) => !prevState);
-    console.log(displayLoader);
   }
 
 
