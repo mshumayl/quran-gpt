@@ -4,13 +4,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { z } from "zod";
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../../db'
 
 import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
 } from "~/server/api/trpc";
+
+//Response type -- to make it easier and more standardized for client to parse.
+type RespT = {
+    result: string;
+}
 
 export const dbRouter = createTRPCRouter({
   fetchVerse: publicProcedure
@@ -19,9 +24,6 @@ export const dbRouter = createTRPCRouter({
         
         const { surahNumber, verseNumber } = input;
         const id = `${surahNumber}_${verseNumber}`
-
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
 
         const querySurahName = await prisma.surahMetadata.findUnique({
             where: { 
@@ -55,9 +57,6 @@ export const dbRouter = createTRPCRouter({
         
         const { surahNumber } = input;
 
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
-
         const querySurahMetadata = await prisma.surahMetadata.findUnique({
             where: { 
                 id: surahNumber
@@ -81,9 +80,6 @@ export const dbRouter = createTRPCRouter({
     saveSnippet: protectedProcedure
     .input(z.object( { verseId: z.string(), userId: z.string() } ))
     .mutation(async ( { input } ) => {
-
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
 
         //TODO: Check if there exists a previous save
         const existingSave = await prisma.savedSnippets.findMany({
@@ -111,9 +107,6 @@ export const dbRouter = createTRPCRouter({
     .input(z.object( { verseId: z.string(), userId: z.string(), id: z.string() } ))
     .mutation(async ( { input } ) => {
         
-        //TODO: Shutdown connection after query
-        const prisma = new PrismaClient();
-
         //Using deleteMany instead of delete to check all params for extra safety
         const deleteSnippet = await prisma.savedSnippets.deleteMany({
             where: {
@@ -130,9 +123,8 @@ export const dbRouter = createTRPCRouter({
     }),
 
     fetchUserSavedSnippets: protectedProcedure
-    .input(z.object( { userId: z.string() } ))
-    .query(async ( {input} ) => {
-        const prisma = new PrismaClient();
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
 
         const userSavedSnippets = await prisma.savedSnippets.findMany({
             where: { 
@@ -146,4 +138,196 @@ export const dbRouter = createTRPCRouter({
         console.log(userSavedSnippets)
         return ({ userSavedSnippets })
     }),
+
+    getSnippetId: protectedProcedure
+    .input(z.object({ userId: z.string(), verseId: z.string() }))
+    .query( async ({ input }) => {
+
+        const snippet = await prisma.savedSnippets.findMany({ 
+            where: {
+                AND: {
+                    userId: input.userId, 
+                    verseId: input.verseId
+                }
+            },
+            select: {
+                id: true
+            }
+         })
+
+         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+         return snippet
+    }),
+
+    //Practically the same with getSnippetId. Use this for future use cases, and retire getSnippetId.
+    isVerseSaved: protectedProcedure
+    .input(z.object({ userId: z.string(), verseId: z.string() }))
+    .query(async ({ input }) => {
+
+        interface isVerseSavedRespT extends RespT {
+            savedVerseUid: string | undefined;
+        }
+        
+        let response: isVerseSavedRespT
+        
+        const dbRes = await prisma.savedSnippets.findMany({
+            where: {
+                AND: {
+                    userId: input.userId,
+                    verseId: input.verseId
+                }
+            },
+            select: {
+                id: true
+            }
+        })
+
+        if (dbRes.length === 1) {
+           response = { result: "SAVED_VERSE_EXISTS", savedVerseUid: dbRes[0]?.id }
+        } else if (dbRes.length > 1) {
+            response = { result: "REDUNDANT_SAVED_VERSE", savedVerseUid: undefined }
+        } else {
+            response = { result: "VERSE_NOT_SAVED", savedVerseUid: undefined }
+        }
+
+        return response
+    }),
+
+    getNotes: protectedProcedure
+    .input(z.object({ snippetId: z.string(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+        
+        interface getNoteRespT extends RespT {
+            data?: {
+                content: string,
+                id: string,
+                createdAt: Date
+            }[]
+        }
+        
+        let response: getNoteRespT;
+
+        if (ctx.session.user.id !== input.userId) {
+            response = { result: "USER_NOT_AUTHORIZED" };
+            return response
+        } else {
+            const dbRes = await prisma.userNotes.findMany({
+                where: {
+                    snippetId: input.snippetId
+                }, 
+                select: {
+                    id: true,
+                    content: true,
+                    createdAt: true
+                }
+            })
+
+            if ( dbRes.length === 0 ) {
+                response = { result: "NO_SAVED_NOTES" }
+                return response
+            } else {
+                response = { result: "NOTES_RETRIEVED", data: dbRes }
+                return response
+            }
+        }
+    }),
+
+    deleteNote: protectedProcedure
+    .input(z.object({ noteId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+
+        const userId = ctx.session.user.id
+        const noteId = input.noteId
+        let deleteNoteResp: RespT;
+        
+        const noteOwner = await prisma.userNotes.findUnique({
+            where: { 
+                id: noteId
+            },
+            include: {
+                savedSnippets: true
+            }
+        })
+
+        if (noteOwner && noteOwner.savedSnippets.userId === userId) {
+            const deletedNote = await prisma.userNotes.delete({
+                where: {
+                    id: noteId
+                }
+            })
+            deleteNoteResp = { result: "NOTE_DELETED" }
+        } else {
+            deleteNoteResp = { result: "USER_UNAUTHORIZED_NOT_NOTE_OWNER" }
+        }
+
+        return deleteNoteResp
+    }),
+
+    addNote: protectedProcedure
+    .input(z.object({ snippetId: z.string(), userId: z.string(), verseId: z.string(), content: z.string() }))
+    .mutation(async ({ input }) => {
+
+        let addNoteResp: RespT;
+        let snippetId = input.snippetId;
+        let savePrefix = ""; //Prefix to prepend on addNoteResp result on successful save + add note
+
+        //If snippetId is an empty string, save the snippet first.
+        //At this stage, there is a huge loophole. If a user immediately adds a second note on an auto-saved verse, the verse will re-save.
+        if (snippetId === "") {
+            //Check redundant save
+            const redundantSaveResp = await prisma.savedSnippets.findFirst({
+                where: {
+                    AND: { 
+                        userId: input.userId,
+                        verseId: input.verseId
+                    }
+                },
+                select: {
+                    id: true
+                }
+            }) 
+
+            if (redundantSaveResp === null) {
+                console.log("Verse have not been saved. Creating new save...")
+                const saveSnippetDbResp = await prisma.savedSnippets.create({
+                    data: {
+                        userId: input.userId,
+                        verseId: input.verseId
+                    },
+                })
+    
+                snippetId = saveSnippetDbResp.id
+                savePrefix = "SAVE_AND_"
+            } else {
+                console.log("Verse previously saved. Skipping to save note.")
+                snippetId = redundantSaveResp.id
+            }
+        }
+
+        //Check if the snippetId belongs to the userId.
+        const snippet = await prisma.savedSnippets.findUnique({ 
+            where: {
+                id: snippetId
+            },
+            select: {
+                userId: true
+            }
+         })
+
+        if (snippet?.userId === input.userId) {
+            //Insert into Notes
+            const note = await prisma.userNotes.create({
+                data: {
+                    snippetId: snippetId,
+                    content: input.content
+                },
+            })
+            console.log("Inserted into UserNotes: ", note)
+            addNoteResp = { result: `${savePrefix}ADD_NOTE_SUCCESS` };
+        } else {
+            addNoteResp = { result: "USER_UNAUTHORIZED_TO_ADD_NOTE" };
+        }
+        
+        return addNoteResp
+    })
 });
