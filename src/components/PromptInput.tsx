@@ -68,14 +68,11 @@ const PromptInput: FC = ({  }) => {
     "Story of Yusuf and his brothers", 
     "Di manakah bahtera Nabi Nuh mendarat",
     "Birth of Jesus",
-    "Nascita di Gesù",
     "Story of David vs Goliath",
-    "Kebobrokan yang dilakukan oleh Samiri",
     "قصة موسى ضد فرعون",
     "Politics in Islam",
     "அரசியல் மற்றும் தலைமைத்துவம்",
     "关于禁食的裁决",
-    "Kebejatan sosial",
     "善待孤儿"
   ]
 
