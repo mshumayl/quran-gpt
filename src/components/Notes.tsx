@@ -53,11 +53,16 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verse
     }
 
     setAiGenerateNoteLoader((previous) => !previous)
+
+    //FUTURE: TODO: Store this returned message in the database to avoid redundant OpenAI calls.
   }
 
   return (
     (AiGenerateNoteLoader) 
-    ? (<div>Loading...</div>)
+    // (true)
+    ? (<div className="grid items-center align-center justify-center justify-items-center">
+        <svg className="w-5 h-5 m-1 stroke-emerald-400 stroke-2 animate-spin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 22c5.421 0 10-4.579 10-10h-2c0 4.337-3.663 8-8 8s-8-3.663-8-8c0-4.336 3.663-8 8-8V2C6.579 2 2 6.58 2 12c0 5.421 4.579 10 10 10z"/></svg>
+      </div>)
     : (<button className="m-1 w-max py-1 px-2 text-white bg-purple-300 hover:bg-purple-400 border border-dashed border-purple-600 
     mr-2 transition-all grid grid-cols-2 justify-items-center items-center rounded-md" onClick={handleAiGenerate}>
         <div className="font-righteous">AI</div>
