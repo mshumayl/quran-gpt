@@ -105,7 +105,7 @@ const PromptInput: FC = ({  }) => {
   return (
     <>
         <form onSubmit={handleSubmit} id="promptForm" name="promptForm" className="flex flex-col justify-center">
-              <label htmlFor="promptInput" className="flex mb-1 mx-1 font-zilla-slab-italic">Search</label>
+              <label htmlFor="promptInput" className="flex mb-1 mx-1 font-zilla-slab">Search</label>
               <textarea
               form="promptForm"
               rows={2}
@@ -121,12 +121,12 @@ const PromptInput: FC = ({  }) => {
               <div className="text-end mx-2 my-1 text-xs text-slate-400">{inputLength}/{maxInputLength}</div>
               <button type="submit" className="transition-all m-10 p-2 flex flex-col items-center bg-emerald-400 
               rounded-lg border border-dashed border-emerald-600 
-              hover:bg-emerald-300 active:bg-emerald-200 text-sm 
+              hover:bg-emerald-300 active:bg-emerald-200 text-md 
               shadow-lg translate-x-1 -translate-y-1 
               hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-md
               active:translate-x-0 active:-translate-y-0 active:shadow-inner
-              text-white
-              font-zilla-slab-italic">
+              text-white tracking-widest
+              font-zilla-slab">
                   Submit
               </button>
         </form>
@@ -139,7 +139,7 @@ const PromptInput: FC = ({  }) => {
           {/* Check if aiResponse is a valid array of objects before mapping. */}
            {aiResponse && aiResponse.map && aiResponse.map(({ surah, verse }) => {
               return ((displayLoader) 
-                ? (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 mt-10 py-1 px-2">Thinking...</div>) 
+                ? (<div key={`${surah}_${verse}`} className="animate-ping font-zilla-slab text-xs h-max w-max text-slate-500 my-4 rounded-lg bg-slate-200 mt-10 py-1 px-2">Thinking...</div>) 
                 : (surah !== 0) 
                 ? (
                   <Link href={`verse/${surah}_${verse}`} className="flex items-center">

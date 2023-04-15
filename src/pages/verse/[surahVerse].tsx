@@ -75,7 +75,7 @@ const Main: NextPage = () => {
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">
         <NavBar/><MobileNavBar/>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
-          <div className="font-zilla-slab-italic text-3xl md:text-6xl">
+          <div className="font-jost text-emerald-500 text-3xl md:text-6xl">
             Verse Details
           </div>
           <div className="mt-2 md:p-10 w-full md:w-7/8 flex flex-col items-center">

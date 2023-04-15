@@ -82,7 +82,7 @@ const Bookmarks = () => {
           <main className="flex flex-col items-center min-h-screen min-w-fit bg-slate-100">
             <NavBar/><MobileNavBar/>
             <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
-              <div className="font-zilla-slab-italic text-3xl md:text-6xl">
+              <div className="font-jost text-emerald-500 text-3xl md:text-6xl">
                 Bookmarked Verses
               </div>
               <div className="w-full md:columns-2 lg:columns-3 items-baseline h-max space-y-10 mt-5 overflow-visible md:items-center md:align-top">

@@ -11,6 +11,10 @@
     src: url("../../public/fonts/ZillaSlab-LightItalic.ttf");
 }
 @font-face {
-    font-family: "righteous";
-    src: url("../../public/fonts/Righteous-Regular.ttf");
+    font-family: "zilla-slab";
+    src: url("../../public/fonts/ZillaSlab-Light.ttf");
+}
+@font-face {
+    font-family: "jost";
+    src: url("../../public/fonts/Jost-SemiBold.ttf");
 }

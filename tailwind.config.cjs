@@ -6,7 +6,8 @@ const config = {
       fontFamily: {
         lateef: ["lateef", "sans-serif"],
         "zilla-slab-italic": ["zilla-slab-italic", "serif"],
-        righteous: ["righteous", "sans-serif"]
+        "zilla-slab": ["zilla-slab", "serif"],
+        jost: ["jost", "sans-serif"]
       }
     },
   },

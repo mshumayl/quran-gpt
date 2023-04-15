@@ -149,7 +149,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
           ? (
           <>
             <Link className="mt-6 -mb-2 w-full self-end md:w-1/3 flex flex-col items-center transition-all
-             font-zilla-slab-italic text-slate-500 rounded-lg shadow-inner
+             font-zilla-slab text-slate-500 rounded-lg shadow-inner
             bg-slate-100 hover:bg-slate-50" key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`}>
               Details
             </Link>
@@ -160,7 +160,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
       </div>
     </div>
   ) : (loader) //If fetching data on page load, display loader 
-  ? (<div className="animate-ping font-zilla-slab-italic text-xs h-max w-max text-slate-500 my-10 rounded-lg bg-slate-200 py-1 px-2">Fetching verses...</div>)
+  ? (<div className="animate-ping font-zilla-slab text-xs h-max w-max text-slate-500 my-10 rounded-lg bg-slate-200 py-1 px-2">Fetching verses...</div>)
   : (<></>))
 }
 
