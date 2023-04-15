@@ -95,7 +95,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
   
   return ((fetchedData) ? (
     <div className="flex flex-col">
-      <div className={`bg-slate-200 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")} md:break-inside-avoid`}>
+      <div className={`bg-gradient-to-tr from-slate-300 to-slate-200 p-10 border border-dashed border-slate-400 rounded-xl w-full flex flex-col text-center shadow-xl transition-all ${(isDetailed) ? (""): ("hover:translate-x-1 hover:-translate-y-1 hover:shadow-2xl")} md:break-inside-avoid`}>
         {
           (isDetailed && dbFetchDetails) //Renders only in verse/ endpoint
           ? (
@@ -103,7 +103,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
             <div className="-mt-6 -mr-6 mb-5 sm:-m-2 flex justify-end cursor-pointer" onClick={handleSave}>
                 <svg className="h-7 w-7 fill-slate-300 stroke-slate-400 hover:fill-slate-400 hover:stroke-slate-500 transition-all" width="800" height="800" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 7.8c0-1.68 0-2.52.327-3.162a3 3 0 0 1 1.311-1.311C7.28 3 8.12 3 9.8 3h4.4c1.68 0 2.52 0 3.162.327a3 3 0 0 1 1.311 1.311C19 5.28 19 6.12 19 7.8V21l-7-4-7 4V7.8Z" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
-            <div className="transition-all w-max sm:w-max self-center px-5 sm:px-10 flex flex-row content-evenly align-middle justify-center gap-5 items-baseline mb-5 bg-slate-300 rounded-full border border-dashed border-slate-400 shadow-inner">
+            <div className="transition-all w-max sm:w-max self-center px-5 sm:px-10 flex flex-row content-evenly align-middle justify-center gap-5 items-baseline mb-5 bg-slate-100 rounded-full border border-dashed border-slate-400 shadow-inner">
               <div className="text-slate-500 mb-2 font-lateef text-md" key={`translation_${surah}_${verse}`}>{dbFetchDetails.data?.surahEName}</div>
               <div className="text-slate-500 font-lateef text-3xl" key={`arabictitle_${surah}_${verse}`}>{dbFetchDetails.data?.surahName}</div>
               <div className="text-slate-500 mb-2 font-lateef text-md" key={`type_${surah}_${verse}`}>{dbFetchDetails.data?.surahType}</div>
@@ -150,7 +150,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
           <>
             <Link className="mt-6 -mb-2 w-full self-end md:w-1/3 flex flex-col items-center transition-all
              font-zilla-slab-italic text-slate-500 rounded-lg shadow-inner
-            bg-slate-300 hover:bg-slate-400" key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`}>
+            bg-slate-100 hover:bg-slate-50" key={`${surah}_${verse}`} href={`verse/${surah}_${verse}`}>
               Details
             </Link>
           </>
