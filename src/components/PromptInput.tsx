@@ -68,6 +68,7 @@ const PromptInput: FC = ({  }) => {
     "Story of Yusuf and his brothers", 
     "Di manakah bahtera Nabi Nuh mendarat",
     "Birth of Jesus",
+    "Longest verse in the Quran",
     "Story of David vs Goliath",
     "قصة موسى ضد فرعون",
     "Politics in Islam",

@@ -29,7 +29,7 @@ export const openAiRouter = createTRPCRouter({
         const openai = new OpenAIApi(configuration);
 
         const prompt = `Do not respond with anything else other than a JSON response. Do not explain your response. 
-        Give me a JSON response specifying the surah numbers and the verse numbers three verses in the Quran that relates with the following keywords: 
+        Give me a JSON response specifying the surah numbers and the verse numbers three verses in the Quran that relates with the following themes: 
         "${input.userPrompt}". 
         Your JSON response needs to strictly follow the following format: 
         "[{"surah": 1, "verse": 1}, {"surah": 1, "verse": 1}, {"surah": 1, "verse": 1}]".`
@@ -53,7 +53,7 @@ export const openAiRouter = createTRPCRouter({
     }),
     
     generateNote: protectedProcedure
-    .input(z.object({ surahNumber: z.string(), verseNumber: z.string() }))
+    .input(z.object({ surahNumber: z.string(), verseNumber: z.string(), verseTranslation: z.string() }))
     .mutation(async ({ ctx, input }) => {
 
         let res: openAiRespT = {
@@ -66,9 +66,15 @@ export const openAiRouter = createTRPCRouter({
         })
         const openai = new OpenAIApi(configuration);
 
-        const prompt = `Please generate a summary of the Quran Surah ${input.surahNumber}, Verse ${input.verseNumber}. 
-        Do not respond with a translation. Just summarize the context and themes of this verse. Respond in less than 140 words.
+        const prompt = `Please generate a summary or commentary of the Quran Surah ${input.surahNumber}, Verse ${input.verseNumber}. 
+        The verse translation is
+        "${input.verseTranslation}"
+        Respond with a commentary on the context and themes of this verse. 
+        Respond in less than 140 words.
+        Do not respond with a translation or a paraphrase.
         Do not tell me the surah and verse numbers.`
+
+        console.log(prompt);
 
         if (ctx.session.user) {
             try {

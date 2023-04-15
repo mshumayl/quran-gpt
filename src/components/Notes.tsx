@@ -7,11 +7,13 @@ import { api } from '~/utils/api';
 interface NotesProps {
     userId: string;
     verseId: string;
+    verseTranslation: string;
 }
 
 interface AIGenerateNoteButtonProps {
   CallbackFn: React.Dispatch<React.SetStateAction<string>>;
   verseId: string;
+  verseTranslation: string;
 }
 
 type savedNoteType = {
@@ -29,7 +31,7 @@ const SubmitNoteButton: FC = () => {
   )
 }
 
-const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verseId }) => {
+const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verseId, verseTranslation }) => {
 
   const [ AiGenerateNoteLoader, setAiGenerateNoteLoader ] = useState(false);
 
@@ -43,7 +45,7 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verse
 
     //Fetch
     if (surahNumber && verseNumber) {
-      res = await aiGenerateNoteApi.mutateAsync({ surahNumber: surahNumber, verseNumber: verseNumber })
+      res = await aiGenerateNoteApi.mutateAsync({ surahNumber: surahNumber, verseNumber: verseNumber, verseTranslation: verseTranslation })
     }
 
     if (res.result === "AI_RESPONSE_RECEIVED" && res.message !== undefined) {
@@ -71,7 +73,7 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verse
   )
 }
 
-const Notes: FC<NotesProps> = ({ userId, verseId }) => {
+const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
 
   const [ savedNoteValue, setSavedNoteValue ] = useState<savedNoteType>([{}]);
   const [ newNoteValue, setNewNoteValue ] = useState(""); //This is used to decide whether or not to render submit button
@@ -213,7 +215,7 @@ const Notes: FC<NotesProps> = ({ userId, verseId }) => {
               </textarea>
               <div className="content-end h-7 grid justify-items-end">
                 {(newNoteValue.length === 0) 
-                && (<AIGenerateNoteButton CallbackFn={setNewNoteValue} verseId={verseId}/>)}
+                && (<AIGenerateNoteButton CallbackFn={setNewNoteValue} verseId={verseId} verseTranslation={verseTranslation}/>)}
               </div>
           </div>
           <div className="h-7 grid justify-items-end">

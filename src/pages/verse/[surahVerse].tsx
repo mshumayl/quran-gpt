@@ -35,7 +35,7 @@ const Main: NextPage = () => {
   const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
   const { data: session } = useSession();
 
-
+  const [ verseTranslation, setVerseTranslation ] = useState("");
 
   useEffect(() => {
     if (bookmarkResult !== "") {
@@ -79,12 +79,17 @@ const Main: NextPage = () => {
             Verse Details
           </div>
           <div className="mt-2 md:p-10 w-full md:w-7/8 flex flex-col items-center">
-            {(surah && verse) ? (<VerseCard surah={parseInt(surah)} verse={parseInt(verse)} isDetailed={true} setToasterResult={setBookmarkResult}/>) : (<>No</>)} 
+            {(surah && verse) ? (<VerseCard 
+            surah={parseInt(surah)} 
+            verse={parseInt(verse)} 
+            isDetailed={true} 
+            setToasterResult={setBookmarkResult}
+            setVerseTranslation={setVerseTranslation}/>) : (<></>)} 
           </div>
         </div>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
           <div className="-mt-14 md:p-10 w-full md:w-7/8   flex flex-col items-center">
-            <Notes verseId={verseId} userId={userId} />
+            <Notes verseId={verseId} userId={userId} verseTranslation={verseTranslation}/>
           </div>
         </div>
         <div className="z-50">

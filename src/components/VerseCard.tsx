@@ -15,9 +15,10 @@ interface VerseCardProps {
   isDetailed?: boolean;
   uid?: string; //Unique ID for table savedSnippets in db. Only available for saved snippets.
   setToasterResult?:  React.Dispatch<React.SetStateAction<string>>; //Callback function to update state in parent component. Parent can be savedVerses or [surahVerse].
+  setVerseTranslation?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToasterResult }) => {
+const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToasterResult, setVerseTranslation }) => {
 
   type responseType = {
       surahName: string | undefined;
@@ -72,7 +73,13 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
   useEffect(() => {
     if (dbFetch !== undefined) {
       //This only runs during page load
-      setFetchedData(dbFetch)
+      setFetchedData(dbFetch);
+
+      //Only to return to [surahVerse] to pass into OpenAI to generate notes (generateNote)
+      if (setVerseTranslation !== undefined && dbFetch.verseTranslation) {
+        setVerseTranslation(dbFetch.verseTranslation);
+      }
+
       setLoader(false);
     }
   }, [dbFetch])
