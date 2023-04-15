@@ -68,8 +68,8 @@ const Main: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Verse Details | AI-Daleel</title>
-        <meta name="description" content="AI-powered al-Quran daleel search" />
+        <title>{surah}:{verse} | AI-Daleel</title>
+        <meta name="description" content="AI-powered al-Quran research companion" />
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">

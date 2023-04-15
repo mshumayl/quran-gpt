@@ -76,7 +76,7 @@ const Bookmarks = () => {
         <>
           <Head>
             <title>Bookmarks | AI-Daleel</title>
-            <meta name="description" content="AI-powered al-Quran daleel search" />
+            <meta name="description" content="AI-powered al-Quran research companion" />
             <link rel="icon" href="/ai-daleel.ico" />
           </Head>
           <main className="flex flex-col items-center min-h-screen min-w-fit bg-slate-100">
