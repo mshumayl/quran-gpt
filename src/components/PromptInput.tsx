@@ -52,14 +52,30 @@ const PromptInput: FC = ({  }) => {
       setDisplayLoader((prevState) => !prevState);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      //TODO: Once there is a proper response object for submitPrompt, remove the eslint escape above
       const res = await submitApi.mutateAsync({ userPrompt: inputValue });
-      const json = JSON.parse(res.response.replace(/[\n\r]/g, ''));
   
-      setAiResponse(json);
+      if (res.result === "SEARCH_SUCCESS") {
+        setAiResponse(res.respObj);
+      } else if (res.result === "INVALID_PROMPT") {
+        //TOAST: Raise error toast here
+        console.log("Invalid prompt input. Please try again.");
+      } else if (res.result === "LENGTH_MOD_PROMPT_INJECTION") {
+        //TOAST: Raise error toast here
+        console.log("Do not inject my prompt bro.");
+      } else if (res.result === "BROKEN_RESPONSE_ARRAY") {
+        //TOAST: Raise error toast here
+        console.log("Broken response array. Please try again.");
+      } else {
+        //TOAST: Raise error toast here
+        console.log("Invalid prompt input. Please try again.");
+      }
+
       setDisplayLoader((prevState) => !prevState);
+      
     } else {
-      //Raise error toast here?
-      console.log("You have used all your seach quota.")
+      //TOAST: Raise error toast here
+      console.log("You have used up all your search quota for the day.");
     }
   }
 

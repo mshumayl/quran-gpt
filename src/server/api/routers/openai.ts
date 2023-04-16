@@ -21,6 +21,21 @@ export const openAiRouter = createTRPCRouter({
     .input(z.object({ userPrompt: z.string() }))
     .mutation(async ({ input }) => {
 
+        interface searchRespT extends openAiRespT {
+            respObj: {
+                "surah": number,
+                "verse": number
+            }[]
+        }
+
+        let res: searchRespT;
+
+        const defaultRes = [{"surah": 0, "verse": 0}, {"surah": 0, "verse": 0}, {"surah": 0, "verse": 0}];
+
+        //Query quota from User table
+        //Check if 0
+        //If not 0, carry out procedure and reduce searchQuota by 1
+        //Might be the best moment to also refactor response object
 
         const { Configuration, OpenAIApi } = require("openai");
         const configuration = new Configuration({
@@ -34,22 +49,35 @@ export const openAiRouter = createTRPCRouter({
         Your JSON response needs to strictly follow the following format: 
         "[{"surah": 1, "verse": 1}, {"surah": 1, "verse": 1}, {"surah": 1, "verse": 1}]".`
 
+
+
+        const openAiRes = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo-0301",
+            messages: [{"role": "user", "content": prompt}]
+        })
+
+        const data = await openAiRes.data.choices[0].message.content;
+
+        //Try to parse into array of object
         try {
-            const res = await openai.createChatCompletion({
-                model: "gpt-3.5-turbo-0301",
-                messages: [{"role": "user", "content": prompt}]
-            })
+            console.log("DATA", data);
+            const respObj = JSON.parse(data.replace(/[\n\r]/g, '') as string);
 
-            const data = await res.data.choices[0].message.content;
-
-            console.log(data)
-
-            return {
-                response: data ? data : `[{"surah": 0, "verse": 0}]`
+            if (JSON.stringify(respObj) === JSON.stringify(defaultRes)) {
+                res = { result: "INVALID_PROMPT", respObj: respObj }
+            } else if (respObj.length > 3) {
+                res = { result: "LENGTH_MOD_PROMPT_INJECTION", respObj: defaultRes }
+            } else {
+                res = { result: "SEARCH_SUCCESS", respObj: respObj }
             }
-        } catch(e) {
-            return {e}
+        } 
+        catch (e) {
+            console.log(e)
+            res = { result: "BROKEN_RESPONSE_ARRAY", respObj: defaultRes }
         }
+
+        return res
+
     }),
     
     generateNote: protectedProcedure
