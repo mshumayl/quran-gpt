@@ -5,6 +5,7 @@ import { type Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, type FC, type FormEvent, useRef } from 'react'
 import { api } from '~/utils/api';
+import Toaster from './Toaster';
 
 interface NotesProps {
     userId: string;
@@ -14,9 +15,12 @@ interface NotesProps {
 
 interface AIGenerateNoteButtonProps {
   setNewNoteValueCallback: React.Dispatch<React.SetStateAction<string>>;
+  setToasterResultCallback: React.Dispatch<React.SetStateAction<string>>;
+  setToasterMessageCallback: React.Dispatch<React.SetStateAction<string>>;
   verseId: string;
   verseTranslation: string;
   session: Session | null;
+  
 }
 
 type savedNoteType = {
@@ -34,7 +38,13 @@ const SubmitNoteButton: FC = () => {
   )
 }
 
-const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ setNewNoteValueCallback, verseId, verseTranslation, session }) => {
+const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ 
+  setNewNoteValueCallback,
+  setToasterResultCallback,
+  setToasterMessageCallback,
+  verseId, 
+  verseTranslation, 
+  session }) => {
 
   const [ AiGenerateNoteLoader, setAiGenerateNoteLoader ] = useState(false);
   const [surahNumber, verseNumber] = verseId.split("_");
@@ -54,15 +64,31 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ setNewNoteValueCa
       }
 
       if (res.result === "AI_RESPONSE_RECEIVED" && res.message !== undefined) {
+        
         setNewNoteValueCallback(res.message)
+      
+      } else if (res.result === "INSUFFICIENT_GENERATE_QUOTA") {
+
+        const message = "You have used all your AI generate quota."
+        setToasterResultCallback(res.result);
+        setToasterMessageCallback(message);
+        console.log(res.result, message)
+
       } else {
-        console.log(res.result)
+
+        const message = "Something went wrong. Please try again."
+        setToasterResultCallback(res.result);
+        setToasterMessageCallback(message);
+        console.log(res.result, message)
+
       }
 
     } else {
 
       const result = "NO_GENERATE_QUOTA"
       const message = "You have run out of generate quota."
+      setToasterResultCallback(result);
+      setToasterMessageCallback(message);
       console.log(message)
       setNewNoteValueCallback("")
 
@@ -91,6 +117,8 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
 
   const [ savedNoteValue, setSavedNoteValue ] = useState<savedNoteType>([{}]);
   const [ newNoteValue, setNewNoteValue ] = useState(""); //This is used to decide whether or not to render submit button
+  const [toasterResult, setToasterResult] = useState<string>("");
+  const [toasterMessage, setToasterMessage] = useState<string>("");
   const newNoteRef = useRef<HTMLFormElement>(null);
 
   const { data: session } = useSession();
@@ -105,6 +133,17 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
 
   const getNotesApi = api.db.getNotes.useMutation()
   
+  //Reset toaster after timeout
+  useEffect(() => {
+    console.log(toasterResult)
+    if (toasterResult !== "") {
+      const timeout = setTimeout(() => {
+        setToasterResult("")
+      }, 4000)
+      return () => clearTimeout(timeout)
+    }
+  }, [toasterResult])
+
   //This useEffect runs on page load. A function will useQuery to get all saved notes.
   //If result set is not empty, update savedNoteValue with result set.
   useEffect(() => {
@@ -234,7 +273,9 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
               <div className="content-end h-7 grid justify-items-end">
                 {(newNoteValue.length === 0) 
                 && (<AIGenerateNoteButton 
-                setNewNoteValueCallback={setNewNoteValue} 
+                setNewNoteValueCallback={setNewNoteValue}
+                setToasterResultCallback={setToasterResult}
+                setToasterMessageCallback={setToasterMessage}
                 verseId={verseId} 
                 verseTranslation={verseTranslation}
                 session={session}/>)}
@@ -262,6 +303,9 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
               </div>)
             }
           })}
+        </div>
+        <div className="z-50">
+          <Toaster status={toasterResult} message={toasterMessage}/>
         </div>
     </div>
   )

@@ -140,6 +140,13 @@ export const openAiRouter = createTRPCRouter({
 
         console.log(prompt);
 
+        if (ctx.session.user.generateQuota && ctx.session.user.generateQuota <= 0) {
+            res = {
+                result: "INSUFFICIENT_GENERATE_QUOTA"
+            }
+            return res
+        }
+
         if (ctx.session.user) {
             try {
                 const openAiRes = await openai.createChatCompletion({
