@@ -12,8 +12,8 @@ const NavBar: FC = () => {
     <>
     {/* Top Nav */}
       <div className="fixed z-40 w-full top-0 bg-slate-50 border-slate-500 border-b border-x justify-center rounded-b-3xl shadow-lg border-dashed h-8 items-center flex-row px-2 flex sm:hidden">
-            <div className="mr-0 sm:mr-1 text-xs flex flex-row gap-1 items-center justify-center w-2/3 font-zilla-slab-italic">
-                {(sessionData) ? (<div className="text-xs mr-1">{sessionData.user.email}</div>) : (<></>)}
+            <div className="mr-0 sm:mr-1 text-xs flex flex-row gap-1 items-center justify-center w-2/3 font-zilla-slab">
+                {(sessionData) ? (<div className="text-xs mr-1 text-emerald-600">{sessionData.user.email}</div>) : (<></>)}
                 <button
                   className="text-xs self-center rounded-md p-1 bg-slate-200 hover:bg-slate-300 transition-all shadow-inner"
                   onClick={sessionData ? () => void signOut({ callbackUrl: '/' }) : () => void signIn()}

@@ -16,8 +16,8 @@ const NavBar: FC = () => {
             <Link className="hover:text-emerald-500" href="/savedVerses">Bookmarks</Link>
             {/* <Link className="hover:text-emerald-500" href="/main">Find Daleel</Link> */}
         </div>
-        <div className="mr-1 flex gap-4 justify-end w-2/3 font-zilla-slab-italic items-center">
-            {(sessionData) ? (<div className="text-xs mr-1">Logged in as {sessionData.user.email}</div>) : (<></>)}
+        <div className="mr-1 flex gap-4 justify-end w-2/3 font-zilla-slab items-center">
+            {(sessionData) ? (<div className="text-xs mr-1">Logged in as <a className="text-emerald-600">{sessionData.user.email}</a></div>) : (<></>)}
             {/* <Link className="text-xs self-center hover:text-emerald-500 border border-slate-500 px-1 bg-white border-dashed" href="/">LOG OUT</Link> */}
             <button
               className="text-xs self-center rounded-md p-1 bg-slate-100 hover:bg-slate-300 transition-all shadow-inner"
