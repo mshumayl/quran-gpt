@@ -12,6 +12,7 @@ import { api } from '~/utils/api';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import Toaster from './Toaster';
 const VerseCard = dynamic(() => import("./VerseCard"), {ssr: false})
 
 const PromptInput: FC = ({  }) => {
@@ -27,6 +28,8 @@ const PromptInput: FC = ({  }) => {
   const [inputLength, setInputLength] = useState<number>(0);
   const [placeholderIndex, setPlaceholderIndex] = useState<number>(0);
   const [displayLoader, setDisplayLoader] = useState<boolean>(false);
+  const [toasterResult, setToasterResult] = useState<string>("");
+  const [toasterMessage, setToasterMessage] = useState<string>("");
   const [aiResponse, setAiResponse] = useState<responseType>(() => {
     // Assign cachedResponse if useState is being run on client-side
     const cachedResponse = (
@@ -44,6 +47,17 @@ const PromptInput: FC = ({  }) => {
 
   const { data: session } = useSession(); // To get quota
 
+  //Reset toaster after timeout
+  useEffect(() => {
+    console.log(toasterResult)
+    if (toasterResult !== "") {
+      const timeout = setTimeout(() => {
+        setToasterResult("")
+      }, 4000)
+      return () => clearTimeout(timeout)
+    }
+  }, [toasterResult])
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -56,32 +70,62 @@ const PromptInput: FC = ({  }) => {
       const res = await submitApi.mutateAsync({ userPrompt: inputValue });
   
       if (res.result === "SEARCH_SUCCESS" && res.respObj !== undefined) {
+        
         setAiResponse(res.respObj);
+
       } else if (res.result === "INVALID_PROMPT") {
-        //TOAST: Raise error toast here
-        console.log("Invalid prompt input. Please try again.");
+        
+        const message = "Invalid prompt input. Please try again."
+        setToasterResult(res.result);
+        setToasterMessage(message);
+        console.log(message);
+
       } else if (res.result === "LENGTH_MOD_PROMPT_INJECTION") {
-        //TOAST: Raise error toast here
-        console.log("Do not inject my prompt bro.");
+
+        const message = "Do not inject my prompt bro."
+        setToasterResult(res.result);
+        setToasterMessage(message);
+        console.log(message);
+
       } else if (res.result === "BROKEN_RESPONSE_ARRAY") {
-        //TOAST: Raise error toast here
-        console.log("Broken response array. Please try again.");
+
+        const message = "Broken response array. Please try again."
+        setToasterResult(res.result);
+        setToasterMessage(message);
+        console.log(message);
+
       } else if (res.result === "OUT_OF_SEARCH_QUOTA") {
-        //TOAST: Raise error toast here
-        console.log("Out of search quota. Try again tomorrow.");
+        
+        const message = "Out of search quota. Try again tomorrow."
+        setToasterResult(res.result);
+        setToasterMessage(message);
+        console.log(message);
+
       } else if (res.result === "UNABLE_TO_RETRIEVE_QUOTA") {
-        //TOAST: Raise error toast here
-        console.log("Unable to retrieve user quota. Please try again.");
+
+        const message = "Unable to retrieve user quota. Please try again."
+        setToasterResult(res.result);
+        setToasterMessage(message);
+        console.log(message);
+
       } else {
-        //TOAST: Raise error toast here
-        console.log("Unexpected prompt input.");
+
+        const message = "Unexpected input. Please try again."
+        setToasterResult("UNEXPECTED");
+        setToasterMessage(message);
+        console.log(message);
+
       }
 
       setDisplayLoader((prevState) => !prevState);
       
     } else {
-      //TOAST: Raise error toast here
-      console.log("You have used up all your search quota for the day.");
+
+      const message = "You have used up all your search quota for the day."
+      setToasterResult("NO_QUOTA");
+      setToasterMessage(message);
+      console.log(message);
+
     }
   }
 
@@ -182,6 +226,10 @@ const PromptInput: FC = ({  }) => {
               );}
             )}
         </ul>
+
+        <div className="z-50">
+          <Toaster status={toasterResult} message={toasterMessage}/>
+        </div>
     </>
   )
 }
