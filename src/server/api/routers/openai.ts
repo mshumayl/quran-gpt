@@ -1,3 +1,4 @@
+import { prisma } from '../../db';
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-var-requires */
@@ -19,10 +20,10 @@ type openAiRespT = {
 export const openAiRouter = createTRPCRouter({
   submitPrompt: publicProcedure
     .input(z.object({ userPrompt: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
 
         interface searchRespT extends openAiRespT {
-            respObj: {
+            respObj?: {
                 "surah": number,
                 "verse": number
             }[]
@@ -36,6 +37,26 @@ export const openAiRouter = createTRPCRouter({
         //Check if 0
         //If not 0, carry out procedure and reduce searchQuota by 1
         //Might be the best moment to also refactor response object
+        console.log(ctx.session?.user.id)
+
+        //quotas.searchQuota is the count needed
+        const quotas = await prisma.user.findUnique({
+            where: {
+                id: ctx.session?.user.id
+            },
+            select: {
+                searchQuota: true
+            }
+        })
+
+        //Return straight away. Do not deduct the quota.
+        if (quotas?.searchQuota !== undefined && quotas?.searchQuota <= 0) {
+            res = { result: "OUT_OF_SEARCH_QUOTA" }
+            return res
+        } else if (quotas?.searchQuota === undefined) {
+            res = { result: "UNABLE_TO_RETRIEVE_QUOTA" }
+            return res 
+        }
 
         const { Configuration, OpenAIApi } = require("openai");
         const configuration = new Configuration({
@@ -49,8 +70,6 @@ export const openAiRouter = createTRPCRouter({
         Your JSON response needs to strictly follow the following format: 
         "[{"surah": 1, "verse": 1}, {"surah": 1, "verse": 1}, {"surah": 1, "verse": 1}]".`
 
-
-
         const openAiRes = await openai.createChatCompletion({
             model: "gpt-3.5-turbo-0301",
             messages: [{"role": "user", "content": prompt}]
@@ -60,20 +79,35 @@ export const openAiRouter = createTRPCRouter({
 
         //Try to parse into array of object
         try {
-            console.log("DATA", data);
+            console.log("DATA: ", data);
             const respObj = JSON.parse(data.replace(/[\n\r]/g, '') as string);
 
             if (JSON.stringify(respObj) === JSON.stringify(defaultRes)) {
-                res = { result: "INVALID_PROMPT", respObj: respObj }
+                res = { result: "INVALID_PROMPT" }
             } else if (respObj.length > 3) {
-                res = { result: "LENGTH_MOD_PROMPT_INJECTION", respObj: defaultRes }
+                res = { result: "LENGTH_MOD_PROMPT_INJECTION" }
             } else {
                 res = { result: "SEARCH_SUCCESS", respObj: respObj }
             }
-        } 
+        }
         catch (e) {
             console.log(e)
-            res = { result: "BROKEN_RESPONSE_ARRAY", respObj: defaultRes }
+            res = { result: "BROKEN_RESPONSE_ARRAY" }
+        }
+
+        //Deduct quota
+        if (quotas && quotas.searchQuota) {
+            const newQuota = quotas.searchQuota as number - 1
+            console.log(`${quotas.searchQuota as number} - 1 = ${newQuota}`)
+
+            await prisma.user.update({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                data: {
+                    searchQuota: newQuota
+                }
+            })
         }
 
         return res

@@ -47,7 +47,7 @@ const PromptInput: FC = ({  }) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    //Check quota
+    //Check quota. useSession is only run on page refresh, so newly exhausted quotas can only be checked on server-side.
     if (session?.user.searchQuota !== 0) {
       setDisplayLoader((prevState) => !prevState);
 
@@ -55,7 +55,7 @@ const PromptInput: FC = ({  }) => {
       //TODO: Once there is a proper response object for submitPrompt, remove the eslint escape above
       const res = await submitApi.mutateAsync({ userPrompt: inputValue });
   
-      if (res.result === "SEARCH_SUCCESS") {
+      if (res.result === "SEARCH_SUCCESS" && res.respObj !== undefined) {
         setAiResponse(res.respObj);
       } else if (res.result === "INVALID_PROMPT") {
         //TOAST: Raise error toast here
@@ -66,9 +66,15 @@ const PromptInput: FC = ({  }) => {
       } else if (res.result === "BROKEN_RESPONSE_ARRAY") {
         //TOAST: Raise error toast here
         console.log("Broken response array. Please try again.");
+      } else if (res.result === "OUT_OF_SEARCH_QUOTA") {
+        //TOAST: Raise error toast here
+        console.log("Out of search quota. Try again tomorrow.");
+      } else if (res.result === "UNABLE_TO_RETRIEVE_QUOTA") {
+        //TOAST: Raise error toast here
+        console.log("Unable to retrieve user quota. Please try again.");
       } else {
         //TOAST: Raise error toast here
-        console.log("Invalid prompt input. Please try again.");
+        console.log("Unexpected prompt input.");
       }
 
       setDisplayLoader((prevState) => !prevState);
