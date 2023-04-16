@@ -9,13 +9,9 @@ import Link from "next/link";
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
 import { getSession } from "next-auth/react";
-import { getClientQuota } from "~/utils/quotas";
 
 const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
-  const quotas = getClientQuota()
-  console.log("Quotas: ", quotas)
   
   return (
     <>

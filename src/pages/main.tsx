@@ -24,7 +24,7 @@ export async function getServerSideProps(context: GetSessionParams | undefined) 
 
 const Main: NextPage = () => {
 
-
+  
   return (
     <>
       <Head>

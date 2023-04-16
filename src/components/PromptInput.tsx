@@ -11,6 +11,7 @@ import { api } from '~/utils/api';
 // Dynamic import with SSR: false to avoid hydration issues. Refer to https://github.com/mshumayl/quran-gpt/issues/7.
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 const VerseCard = dynamic(() => import("./VerseCard"), {ssr: false})
 
 const PromptInput: FC = ({  }) => {
@@ -41,19 +42,26 @@ const PromptInput: FC = ({  }) => {
 
   const submitApi = api.openai.submitPrompt.useMutation();
 
-  
+  const { data: session } = useSession(); // To get quota
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    setDisplayLoader((prevState) => !prevState);
     e.preventDefault();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    const res = await submitApi.mutateAsync({ userPrompt: inputValue });
-    const json = JSON.parse(res.response.replace(/[\n\r]/g, ''));
+    //Check quota
+    if (session?.user.searchQuota !== 0) {
+      setDisplayLoader((prevState) => !prevState);
 
-    setAiResponse(json);
-    setDisplayLoader((prevState) => !prevState);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      const res = await submitApi.mutateAsync({ userPrompt: inputValue });
+      const json = JSON.parse(res.response.replace(/[\n\r]/g, ''));
+  
+      setAiResponse(json);
+      setDisplayLoader((prevState) => !prevState);
+    } else {
+      //Raise error toast here?
+      console.log("You have used all your seach quota.")
+    }
   }
-
 
   const handleClear = () => {
     setAiResponse(defaultResponse);
@@ -119,6 +127,7 @@ const PromptInput: FC = ({  }) => {
               }}>
               </textarea>
               <div className="text-end mx-2 my-1 text-xs text-slate-400">{inputLength}/{maxInputLength}</div>
+              {/* Submit button */}
               <button type="submit" className="transition-all m-10 p-2 flex flex-col items-center bg-emerald-400 
               rounded-lg border border-dashed border-emerald-600 
               hover:bg-emerald-300 active:bg-emerald-200 text-md 
@@ -131,6 +140,7 @@ const PromptInput: FC = ({  }) => {
               </button>
         </form>
         
+        {/* Clear results button */}
         {(aiResponse.length === 3) 
         ? (<button onClick={handleClear} className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic text-slate-600 hover:text-emerald-500">Clear results</button>) 
         : (<></>)}
