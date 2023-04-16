@@ -67,7 +67,7 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({
         
         setNewNoteValueCallback(res.message)
       
-      } else if (res.result === "INSUFFICIENT_GENERATE_QUOTA") {
+      } else if (res.result === "OUT_OF_GENERATE_QUOTA") {
 
         const message = "You have used all your AI generate quota."
         setToasterResultCallback(res.result);
@@ -89,7 +89,7 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({
       const message = "You have run out of generate quota."
       setToasterResultCallback(result);
       setToasterMessageCallback(message);
-      console.log(message)
+      console.log(result, message)
       setNewNoteValueCallback("")
 
     }

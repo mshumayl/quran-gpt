@@ -39,7 +39,8 @@ export const openAiRouter = createTRPCRouter({
         //Might be the best moment to also refactor response object
         console.log(ctx.session?.user.id)
 
-        //quotas.searchQuota is the count needed
+        //quotas.searchQuota is the count needed. 
+        //Using ctx might be more performant, but it might not reflect the latest value as it is only fetched on client page load.
         const quotas = await prisma.user.findUnique({
             where: {
                 id: ctx.session?.user.id
@@ -124,6 +125,24 @@ export const openAiRouter = createTRPCRouter({
             result: ""
         }
 
+        const quotas = await prisma.user.findUnique({
+            where: {
+                id: ctx.session?.user.id
+            },
+            select: {
+                generateQuota: true
+            }
+        })
+
+        //Return straight away. Do not deduct the quota.
+        if (quotas?.generateQuota !== undefined && quotas?.generateQuota <= 0) {
+            res = { result: "OUT_OF_GENERATE_QUOTA" }
+            return res
+        } else if (quotas?.generateQuota === undefined) {
+            res = { result: "UNABLE_TO_RETRIEVE_QUOTA" }
+            return res 
+        }
+
         const { Configuration, OpenAIApi } = require("openai");
         const configuration = new Configuration({
             apiKey: env.OPENAI_SECRET_KEY,
@@ -140,12 +159,6 @@ export const openAiRouter = createTRPCRouter({
 
         console.log(prompt);
 
-        if (ctx.session.user.generateQuota && ctx.session.user.generateQuota <= 0) {
-            res = {
-                result: "INSUFFICIENT_GENERATE_QUOTA"
-            }
-            return res
-        }
 
         if (ctx.session.user) {
             try {
@@ -169,6 +182,23 @@ export const openAiRouter = createTRPCRouter({
             res = {
                 result: "USER_NOT_AUTHORIZED"
             }
+        }
+
+        //Finally, deduct quota
+        if (quotas && quotas.generateQuota) {
+            const prevQuota: number = quotas.generateQuota
+
+            const newQuota = prevQuota - 1
+            console.log(`${prevQuota} - 1 = ${newQuota}`)
+
+            await prisma.user.update({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                data: {
+                    generateQuota: newQuota
+                }
+            })
         }
         
         return res
