@@ -22,14 +22,17 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role: string;
+      searchQuota: number | undefined;
+      generateQuota: number | undefined;
+      bookmarkQuota: number | undefined;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    role: string;
+  }
 }
 
 /**
@@ -39,10 +42,21 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session({ session, user }) {
-      if (session.user) {
+    async session({ session, user }) {
+
+      //Do prisma query here to get quotas and role?
+      const authorization = await prisma.user.findUnique({
+        where: { 
+          id: user.id
+        }
+      })
+
+      if (session.user && authorization) {
         session.user.id = user.id;
-        // session.user.role = user.role; <-- put other properties on the session here
+        session.user.role = authorization.role as string; // <-- put other properties on the session here
+        session.user.searchQuota = authorization.searchQuota as number;
+        session.user.generateQuota = authorization.generateQuota as number;
+        session.user.bookmarkQuota = authorization.bookmarkQuota as number;
       }
       return session;
     },
