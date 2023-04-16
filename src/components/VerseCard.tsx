@@ -60,8 +60,16 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setBookm
         }
       }
     } else {
+
+      
       const message = "You are out of bookmarks quota. Remove existing bookmarks to add more."
       const result = "OUT_OF_BOOKMARK_QUOTA"
+
+      if (setBookmarkResultCallback && setBookmarkMessageCallback) {
+        setBookmarkResultCallback(result);
+        setBookmarkMessageCallback(message);
+      }
+
       console.log(result, message)
     }
   }
@@ -71,12 +79,11 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setBookm
 
     //Addition in API, not reduction
     if (session && uid) {
-      const deleteRes = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
-      console.log(deleteRes);
+      const res = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
 
       //If callback function is passed as prop
       if (setBookmarkResultCallback) {
-        setBookmarkResultCallback(deleteRes);
+        setBookmarkResultCallback(res.result);
       }
       
       setFetchedData(undefined);

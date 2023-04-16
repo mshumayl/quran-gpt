@@ -146,8 +146,20 @@ export const dbRouter = createTRPCRouter({
 
     removeSnippet: protectedProcedure
     .input(z.object( { verseId: z.string(), userId: z.string(), id: z.string() } ))
-    .mutation(async ( { input } ) => {
+    .mutation(async ({ ctx, input }) => {
         
+        let res: RespT;
+
+        //Get bookmarkQuota, no need to do any checking
+        const quotas = await prisma.user.findUnique({
+            where: {
+                id: ctx.session?.user.id
+            },
+            select: {
+                bookmarkQuota: true
+            }
+        })
+
         //Using deleteMany instead of delete to check all params for extra safety
         const deleteSnippet = await prisma.savedSnippets.deleteMany({
             where: {
@@ -159,8 +171,30 @@ export const dbRouter = createTRPCRouter({
             },
         })
 
-        console.log(deleteSnippet)
-        return (`REMOVE_SUCCESSFUL`)
+        if (deleteSnippet) {
+            res = { result: "REMOVE_SUCCESSFUL" }
+        } else {
+            res = { result: "SAVED_VERSE_NOT_FOUND"}
+        }
+
+        //Perform quota addition
+        if (quotas) {
+            const prevQuota: number = quotas.bookmarkQuota
+
+            const newQuota = prevQuota + 1
+            console.log(`${prevQuota} + 1 = ${newQuota}`)
+
+            await prisma.user.update({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                data: {
+                    bookmarkQuota: newQuota
+                }
+            })
+        }
+
+        return res
     }),
 
     fetchUserSavedSnippets: protectedProcedure
