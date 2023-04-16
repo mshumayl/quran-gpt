@@ -97,8 +97,10 @@ export const openAiRouter = createTRPCRouter({
 
         //Deduct quota
         if (quotas && quotas.searchQuota) {
-            const newQuota = quotas.searchQuota as number - 1
-            console.log(`${quotas.searchQuota as number} - 1 = ${newQuota}`)
+            const prevQuota: number = quotas.searchQuota
+
+            const newQuota = prevQuota - 1
+            console.log(`${prevQuota} - 1 = ${newQuota}`)
 
             await prisma.user.update({
                 where: {

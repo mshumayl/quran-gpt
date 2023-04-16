@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
       })
 
       if (session.user && authorization) {
+        
         session.user.id = user.id;
         session.user.role = authorization.role as string; // <-- put other properties on the session here
         session.user.searchQuota = authorization.searchQuota as number;
