@@ -13,7 +13,7 @@ interface NotesProps {
 }
 
 interface AIGenerateNoteButtonProps {
-  CallbackFn: React.Dispatch<React.SetStateAction<string>>;
+  setNewNoteValueCallback: React.Dispatch<React.SetStateAction<string>>;
   verseId: string;
   verseTranslation: string;
   session: Session | null;
@@ -34,7 +34,7 @@ const SubmitNoteButton: FC = () => {
   )
 }
 
-const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verseId, verseTranslation, session }) => {
+const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ setNewNoteValueCallback, verseId, verseTranslation, session }) => {
 
   const [ AiGenerateNoteLoader, setAiGenerateNoteLoader ] = useState(false);
   const [surahNumber, verseNumber] = verseId.split("_");
@@ -54,7 +54,7 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verse
       }
 
       if (res.result === "AI_RESPONSE_RECEIVED" && res.message !== undefined) {
-        CallbackFn(res.message)
+        setNewNoteValueCallback(res.message)
       } else {
         console.log(res.result)
       }
@@ -64,7 +64,7 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verse
       const result = "NO_GENERATE_QUOTA"
       const message = "You have run out of generate quota."
       console.log(message)
-      CallbackFn("")
+      setNewNoteValueCallback("")
 
     }
 
@@ -234,7 +234,7 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
               <div className="content-end h-7 grid justify-items-end">
                 {(newNoteValue.length === 0) 
                 && (<AIGenerateNoteButton 
-                CallbackFn={setNewNoteValue} 
+                setNewNoteValueCallback={setNewNoteValue} 
                 verseId={verseId} 
                 verseTranslation={verseTranslation}
                 session={session}/>)}
