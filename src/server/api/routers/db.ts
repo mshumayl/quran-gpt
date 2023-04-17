@@ -409,7 +409,7 @@ export const dbRouter = createTRPCRouter({
 
     getQuotas: protectedProcedure
     .input(z.object({}))
-    .mutation(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
         
         interface getQuotasRespT extends RespT {
             data: {
