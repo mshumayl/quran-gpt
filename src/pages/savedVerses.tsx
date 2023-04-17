@@ -89,7 +89,7 @@ const Bookmarks = () => {
                  {(savedVerses && savedVerses.map && savedVerses.map(({ surah, verse, uid }) => {
                   return ((surah !== undefined && verse !== undefined) ? 
                     (
-                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid} setToasterResult={setBookmarkResult}/>
+                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid} setBookmarkResultCallback={setBookmarkResult}/>
                     )
                     : (<></>)
                   )
