@@ -18,9 +18,9 @@ const NavBar: FC = () => {
             {/* <Link className="hover:text-emerald-500" href="/main">Find Daleel</Link> */}
         </div>
         <div className="mr-1 flex gap-4 justify-end w-2/3 font-zilla-slab items-center divide-x-1">
-          {/* <div className="">
+          <div className="">
             <QuotaCount/>
-          </div> */}
+          </div>
             {(sessionData) ? (<div className="text-xs mr-1">Logged in as <a className="text-emerald-600">{sessionData.user.email}</a></div>) : (<></>)}
             <button
               className="text-xs self-center rounded-md bg-slate-200 hover:bg-slate-50 transition-all border border-slate-400 border-dashed p-2"
