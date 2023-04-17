@@ -39,32 +39,33 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setBookm
     if (session && session?.user.bookmarkQuota !== 0) {
       const res = await saveApi.mutateAsync({ verseId: `${surah}_${verse}`, userId: session?.user.id });
 
-      if (res.result === "SAVE_SUCCESS" || res.result === "SAVE_EXISTS") {
+      if (res.result === "SAVE_SUCCESS" && res.message) {
         //If callback function is passed as prop
+        if (setBookmarkResultCallback && setBookmarkMessageCallback) {
+          setBookmarkResultCallback(res.result);
+          setBookmarkMessageCallback(res.message);
+        }
+      } else if (res.result === "SAVE_EXISTS") {
         if (setBookmarkResultCallback) {
           setBookmarkResultCallback(res.result);
         }
-      } else if (res.result === "OUT_OF_BOOKMARK_QUOTA") {
+      } else if (res.result && res.message) {
         if (setBookmarkResultCallback && setBookmarkMessageCallback) {
-          const message = "You have used up your bookmark quota. Remove existing bookmarks to add more.";
-          
           setBookmarkResultCallback(res.result);
-          setBookmarkMessageCallback(message);
+          setBookmarkMessageCallback(res.message);
+          console.log("Remove bookmark woi!")
         }
       } else {
         if (setBookmarkResultCallback && setBookmarkMessageCallback) {
           const message = "Bookmark failed. Please try again.";
-          
           setBookmarkResultCallback(res.result);
           setBookmarkMessageCallback(message);
         }
       }
     } else {
 
-      
       const message = "You are out of bookmarks quota. Remove existing bookmarks to add more."
       const result = "OUT_OF_BOOKMARK_QUOTA"
-
       if (setBookmarkResultCallback && setBookmarkMessageCallback) {
         setBookmarkResultCallback(result);
         setBookmarkMessageCallback(message);
@@ -82,8 +83,9 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setBookm
       const res = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
 
       //If callback function is passed as prop
-      if (setBookmarkResultCallback) {
+      if (setBookmarkResultCallback && setBookmarkMessageCallback && res.message) {
         setBookmarkResultCallback(res.result);
+        setBookmarkMessageCallback(res.message);
       }
       
       setFetchedData(undefined);

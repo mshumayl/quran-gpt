@@ -37,6 +37,7 @@ const Bookmarks = () => {
     }[] | undefined
       
     const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
+    const [ bookmarkMessage, setBookmarkMessage ] = useState("") 
 
     useEffect(() => {
       if (bookmarkResult !== "") {
@@ -89,7 +90,7 @@ const Bookmarks = () => {
                  {(savedVerses && savedVerses.map && savedVerses.map(({ surah, verse, uid }) => {
                   return ((surah !== undefined && verse !== undefined) ? 
                     (
-                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid} setBookmarkResultCallback={setBookmarkResult}/>
+                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid} setBookmarkResultCallback={setBookmarkResult} setBookmarkMessageCallback={setBookmarkMessage}/>
                     )
                     : (<></>)
                   )
@@ -103,7 +104,7 @@ const Bookmarks = () => {
                 </>) 
               : (<></>)}
               <div className="z-50">
-                <Toaster status={bookmarkResult}/>
+                <Toaster status={bookmarkResult} message={bookmarkMessage}/>
               </div>
             </div>
           </main>

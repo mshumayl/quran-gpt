@@ -73,47 +73,20 @@ const PromptInput: FC = ({  }) => {
         
         setAiResponse(res.respObj);
 
-      } else if (res.result === "INVALID_PROMPT") {
-        
-        const message = "Invalid prompt input. Please try again."
         setToasterResult(res.result);
-        setToasterMessage(message);
-        console.log(message);
+        setToasterMessage(res.message);
 
-      } else if (res.result === "LENGTH_MOD_PROMPT_INJECTION") {
+      } else if (res.result && res.message) {
 
-        const message = "Do not inject my prompt bro."
         setToasterResult(res.result);
-        setToasterMessage(message);
-        console.log(message);
-
-      } else if (res.result === "BROKEN_RESPONSE_ARRAY") {
-
-        const message = "Broken response array. Please try again."
-        setToasterResult(res.result);
-        setToasterMessage(message);
-        console.log(message);
-
-      } else if (res.result === "OUT_OF_SEARCH_QUOTA") {
-        
-        const message = "Out of search quota. Try again tomorrow."
-        setToasterResult(res.result);
-        setToasterMessage(message);
-        console.log(message);
-
-      } else if (res.result === "UNABLE_TO_RETRIEVE_QUOTA") {
-
-        const message = "Unable to retrieve user quota. Please try again."
-        setToasterResult(res.result);
-        setToasterMessage(message);
-        console.log(message);
+        setToasterMessage(res.message);
 
       } else {
 
+        const result = "UNEXPECTED"
         const message = "Unexpected input. Please try again."
-        setToasterResult("UNEXPECTED");
+        setToasterResult(result);
         setToasterMessage(message);
-        console.log(message);
 
       }
 
@@ -121,10 +94,10 @@ const PromptInput: FC = ({  }) => {
       
     } else {
 
-      const message = "You have used up all your search quota for the day."
-      setToasterResult("NO_QUOTA");
+      const result = "NO_SEARCH_QUOTA"
+      const message = "You have run out of search quota for the day. Please try again tomorrow."
+      setToasterResult(result);
       setToasterMessage(message);
-      console.log(message);
 
     }
   }

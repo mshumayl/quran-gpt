@@ -49,7 +49,7 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({
   const [ AiGenerateNoteLoader, setAiGenerateNoteLoader ] = useState(false);
   const [surahNumber, verseNumber] = verseId.split("_");
 
-  let res: { result: string; message?: string | undefined; };
+  let res: { result: string; message?: string, data?: string };
 
   const aiGenerateNoteApi = api.openai.generateNote.useMutation();
 
@@ -63,35 +63,37 @@ const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({
         res = await aiGenerateNoteApi.mutateAsync({ surahNumber: surahNumber, verseNumber: verseNumber, verseTranslation: verseTranslation })
       }
 
-      if (res.result === "AI_RESPONSE_RECEIVED" && res.message !== undefined) {
+      if (res.result === "AI_RESPONSE_RECEIVED" && res.data && res.message) {
         
-        setNewNoteValueCallback(res.message)
+        setNewNoteValueCallback(res.data)
+
+        setToasterResultCallback(res.result);
+        setToasterMessageCallback(res.message);
       
-      } else if (res.result === "OUT_OF_GENERATE_QUOTA") {
+      } else if (res.result === "OUT_OF_GENERATE_QUOTA" && res.message) {
 
-        const message = "You have used all your AI generate quota."
         setToasterResultCallback(res.result);
-        setToasterMessageCallback(message);
-        console.log(res.result, message)
+        setToasterMessageCallback(res.message);
+        console.log(res.result, res.message);
+        //Consider triggering modal here.
 
-      } else {
+      } else if (res.result && res.message) {
 
-        const message = "Something went wrong. Please try again."
         setToasterResultCallback(res.result);
-        setToasterMessageCallback(message);
-        console.log(res.result, message)
+        setToasterMessageCallback(res.message);
+        console.log(res.result, res.message)
 
       }
 
     } else {
 
       const result = "NO_GENERATE_QUOTA"
-      const message = "You have run out of generate quota."
+      const message = "You have run out of AI Generate quota."
       setToasterResultCallback(result);
       setToasterMessageCallback(message);
-      console.log(result, message)
-      setNewNoteValueCallback("")
 
+      setNewNoteValueCallback("")
+    
     }
 
     setAiGenerateNoteLoader((previous) => !previous)

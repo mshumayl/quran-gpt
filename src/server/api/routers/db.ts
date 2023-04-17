@@ -15,6 +15,7 @@ import {
 //Response type -- to make it easier and more standardized for client to parse.
 type RespT = {
     result: string;
+    message?: string;
 }
 
 export const dbRouter = createTRPCRouter({
@@ -95,10 +96,10 @@ export const dbRouter = createTRPCRouter({
 
         //Return straight away. Do not deduct the quota.
         if (quotas?.bookmarkQuota !== undefined && quotas?.bookmarkQuota <= 0) {
-            res = { result: "OUT_OF_BOOKMARK_QUOTA" }
+            res = { result: "OUT_OF_BOOKMARK_QUOTA", message: "You have used up all your bookmark quota. Remove existing bookmarks to add more."}
             return res
         } else if (quotas?.bookmarkQuota === undefined) {
-            res = { result: "UNABLE_TO_RETRIEVE_QUOTA" }
+            res = { result: "UNABLE_TO_RETRIEVE_QUOTA", message: "Error retrieving bookmarks quota. Please try again." }
             return res 
         }
 
@@ -118,7 +119,7 @@ export const dbRouter = createTRPCRouter({
                 },
             })
             console.log(snippet)
-            res = { result: "SAVE_SUCCESS" }
+            res = { result: "SAVE_SUCCESS", message: `Verse successfully bookmarked. You have ${quotas.bookmarkQuota-1} bookmark quota remaining.` } //Modify toast to display quota
         } else {
             res = { result: "SAVE_EXISTS" }
         }
@@ -171,8 +172,8 @@ export const dbRouter = createTRPCRouter({
             },
         })
 
-        if (deleteSnippet) {
-            res = { result: "REMOVE_SUCCESSFUL" }
+        if (deleteSnippet && quotas) {
+            res = { result: "REMOVE_SUCCESSFUL", message: `Verse bookmark removed. You have ${quotas.bookmarkQuota+1} bookmark quota remaining.` }
         } else {
             res = { result: "SAVED_VERSE_NOT_FOUND"}
         }
