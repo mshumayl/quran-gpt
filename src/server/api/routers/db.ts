@@ -405,5 +405,71 @@ export const dbRouter = createTRPCRouter({
         }
         
         return addNoteResp
+    }),
+
+    getQuotas: protectedProcedure
+    .input(z.object({}))
+    .mutation(async ({ ctx, input }) => {
+        
+        interface getQuotasRespT extends RespT {
+            data: {
+                searchQuota: number;
+                generateQuota: number;
+                bookmarkQuota: number;
+            }
+        }
+        
+        let res: getQuotasRespT;
+
+        //Check bookmark quota here
+
+        try {
+            const quotas = await prisma.user.findUnique({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                select: {
+                    searchQuota: true,
+                    generateQuota: true,
+                    bookmarkQuota: true,
+                }
+            })
+
+            if (quotas) {
+                
+                res = {
+                    result: "QUOTAS_OBTAINED",
+                    data: {
+                        searchQuota: quotas?.searchQuota,
+                        generateQuota: quotas?.generateQuota,
+                        bookmarkQuota: quotas?.bookmarkQuota
+                    }
+                }        
+
+            } else {
+                
+                res = {
+                    result: "QUOTAS_NOT_FOUND",
+                    data: {
+                        searchQuota: 0,
+                        generateQuota: 0,
+                        bookmarkQuota: 0
+                    }
+                }
+
+            }
+            
+        } catch (e) {
+            res = {
+                result: "QUOTAS_NOT_FOUND",
+                data: {
+                    searchQuota: 0,
+                    generateQuota: 0,
+                    bookmarkQuota: 0
+                }
+            }
+        }
+        
+        return res
     })
 });
