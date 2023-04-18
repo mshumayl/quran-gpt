@@ -74,7 +74,9 @@ const Main: NextPage = () => {
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">
-        <NavBar/><MobileNavBar/>
+        <div className="w-full z-40">
+          <NavBar/><MobileNavBar/>
+        </div>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
           <div className="font-jost text-emerald-500 text-3xl md:text-6xl">
             Verse Details

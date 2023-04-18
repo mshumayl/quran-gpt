@@ -81,7 +81,9 @@ const Bookmarks = () => {
             <link rel="icon" href="/ai-daleel.ico" />
           </Head>
           <main className="flex flex-col items-center min-h-screen min-w-fit bg-slate-100">
-            <NavBar/><MobileNavBar/>
+            <div className="w-full z-40">
+              <NavBar/><MobileNavBar/>
+            </div>
             <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
               <div className="font-jost text-emerald-500 text-3xl md:text-6xl">
                 Bookmarked Verses
