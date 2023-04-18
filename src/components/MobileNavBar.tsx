@@ -1,20 +1,24 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { type FC } from 'react'
+import React, { useState, type FC } from 'react'
 import { useRouter } from 'next/router';
 import QuotaCount from './QuotaCount';
+import Modal from './Modal';
 
 const NavBar: FC = () => {
   const { data: sessionData } = useSession();
   const { asPath } = useRouter();
 
+  const [ modalVisible, setModalVisible ] = useState(false);
+
   return (
-    <>
+    <div className="flex w-full">
     {/* Top Nav */}
-      <div className="fixed z-40 w-full top-0 bg-slate-200 border-slate-500 border-b border-x justify-between rounded-b-3xl shadow-lg border-dashed h-12 items-center flex-row px-5 flex sm:hidden">
+      <div className="fixed z-40 w-full top-0 bg-slate-200
+       border-slate-500 border-b border-x justify-between rounded-b-3xl shadow-lg border-dashed h-12 items-center flex-row px-5 flex sm:hidden">
             <div className="">
-              <QuotaCount/>
+              <QuotaCount setModalVisibleCallback={setModalVisible}/>
             </div>
             <div className="mr-0 text-xs flex flex-row gap-1 items-center justify-end w-2/3 font-zilla-slab">
                 {(sessionData) ? (<div className="text-xs mr-1 text-emerald-600">{sessionData.user.email}</div>) : (<></>)}
@@ -25,6 +29,9 @@ const NavBar: FC = () => {
                 {sessionData ? "Sign out" : "Sign in"}
                 </button>
             </div>
+      </div>
+      <div className="fixed sm:hidden w-full justify-center flex">
+          <Modal/>
       </div>
     {/* Bottom Nav */}
       <div className="fixed z-40 w-full bottom-0 bg-slate-50 border-slate-500 border-t border-x rounded-t-3xl shadow-lg border-dashed h-12 items-center grid grid-cols-3 flex-row px-2 sm:hidden transition-all">
@@ -38,7 +45,7 @@ const NavBar: FC = () => {
           <svg className={`h-7 w-7 ${(asPath==="/savedVerses") ? ("fill-emerald-300 stroke-emerald-400 hover:fill-emerald-400 hover:stroke-emerald-500 "): ("fill-slate-300 stroke-slate-400 hover:fill-slate-400 hover:stroke-slate-500")} transition-all`} width="800" height="800" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 7.8c0-1.68 0-2.52.327-3.162a3 3 0 0 1 1.311-1.311C7.28 3 8.12 3 9.8 3h4.4c1.68 0 2.52 0 3.162.327a3 3 0 0 1 1.311 1.311C19 5.28 19 6.12 19 7.8V21l-7-4-7 4V7.8Z" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </Link>
       </div>
-    </>
+    </div>
     
   )
 }
