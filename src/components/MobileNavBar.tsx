@@ -3,6 +3,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import React, { type FC } from 'react'
 import { useRouter } from 'next/router';
+import QuotaCount from './QuotaCount';
 
 const NavBar: FC = () => {
   const { data: sessionData } = useSession();
@@ -11,11 +12,14 @@ const NavBar: FC = () => {
   return (
     <>
     {/* Top Nav */}
-      <div className="fixed z-40 w-full top-0 bg-slate-50 border-slate-500 border-b border-x justify-center rounded-b-3xl shadow-lg border-dashed h-8 items-center flex-row px-2 flex sm:hidden">
-            <div className="mr-0 sm:mr-1 text-xs flex flex-row gap-1 items-center justify-center w-2/3 font-zilla-slab">
+      <div className="fixed z-40 w-full top-0 bg-slate-200 border-slate-500 border-b border-x justify-between rounded-b-3xl shadow-lg border-dashed h-12 items-center flex-row px-5 flex sm:hidden">
+            <div className="">
+              <QuotaCount/>
+            </div>
+            <div className="mr-0 text-xs flex flex-row gap-1 items-center justify-end w-2/3 font-zilla-slab">
                 {(sessionData) ? (<div className="text-xs mr-1 text-emerald-600">{sessionData.user.email}</div>) : (<></>)}
                 <button
-                  className="text-xs self-center rounded-md p-1 bg-slate-200 hover:bg-slate-300 transition-all shadow-inner"
+                  className="text-xs self-center rounded-md bg-slate-200 hover:bg-slate-50 transition-all border border-slate-400 border-dashed p-1"
                   onClick={sessionData ? () => void signOut({ callbackUrl: '/' }) : () => void signIn()}
                 >
                 {sessionData ? "Sign out" : "Sign in"}
