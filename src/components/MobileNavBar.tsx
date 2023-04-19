@@ -31,7 +31,7 @@ const NavBar: FC = () => {
             </div>
       </div>
       <div className="fixed sm:hidden w-full justify-center flex">
-          <Modal/>
+          <Modal setModalVisibleCallback={setModalVisible}/>
       </div>
     {/* Bottom Nav */}
       <div className="fixed z-40 w-full bottom-0 bg-slate-50 border-slate-500 border-t border-x rounded-t-3xl shadow-lg border-dashed h-12 items-center grid grid-cols-3 flex-row px-2 sm:hidden transition-all">

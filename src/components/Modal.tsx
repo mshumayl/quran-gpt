@@ -4,9 +4,19 @@ import React, { useState, type FC } from 'react'
 import { api } from '~/utils/api';
 
 
+interface ModalProps {
+    setModalVisibleCallback: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const Modal: FC = () => {
 
+const Modal: FC<ModalProps> = ({ setModalVisibleCallback }) => {
+
+    //Notify Handler
+        //Call tRPC method
+        //setModalVisibleCallback(false);
+
+    //NoThanks Handler
+        //setModalVisibleCallback(false);
 
     return (
         <div className="fixed w-11/12 h-fit sm:w-5/6 md:w-4/5 lg:w-1/2 top-72 bg-white shadow-2xl rounded-2xl border border-dashed border-slate-400 p-10 justify-center content-center">
