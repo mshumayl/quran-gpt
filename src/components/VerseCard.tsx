@@ -63,7 +63,7 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setBookm
         }
       }
     } else {
-
+      //BUG: TODO: This should not display if the user has already bookmarked this. Deferring bug fix to another time.
       const message = "You are out of bookmarks quota. Remove existing bookmarks to add more."
       const result = "OUT_OF_BOOKMARK_QUOTA"
       if (setBookmarkResultCallback && setBookmarkMessageCallback) {

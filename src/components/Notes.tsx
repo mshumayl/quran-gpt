@@ -197,13 +197,13 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
       });
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       console.log(res)
-
+      
       //This async function is required as await can only be run inside an async function, but useEffect cannot be async.
       //This is the exact same function used in the useEffect above. It is used here to refetch the content with date and ID.
       async function getNotesFetcher() {
         const dbNotes = await getNotesApi.mutateAsync({ userId: userId, snippetId: snippetId })
         
-        if ( dbNotes?.result === "NOTES_RETRIEVED" ) {
+        if (dbNotes?.result === "NOTES_RETRIEVED") {
             const contents = dbNotes?.data?.map(({ id, content, createdAt }) => {
               return { id: id, note: content, saveTime: createdAt }
             })
@@ -211,9 +211,25 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
             if (contents !== undefined) {
               setSavedNoteValue(contents)
             }
-        }
+        } 
       }
-      void getNotesFetcher();
+
+      if (res.result === "OUT_OF_BOOKMARK_QUOTA" && res.message) {
+        //Remove last value
+        const originalArray = savedNoteValue.slice(0, savedNoteValue.length - 1)
+        console.log("savedNoteValue", savedNoteValue)
+        console.log("originalArray", originalArray)
+        setSavedNoteValue([...originalArray])
+        
+        setToasterResult(res.result);
+        setToasterMessage(res.message);
+
+        //set Toast
+        console.log("Toast message: ", res?.message)
+      } else {
+        void getNotesFetcher();
+      }
+
     }
   }
 

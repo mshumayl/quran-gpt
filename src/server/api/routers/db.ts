@@ -84,24 +84,7 @@ export const dbRouter = createTRPCRouter({
 
         let res: RespT;
 
-        //Check bookmark quota here
-        const quotas = await prisma.user.findUnique({
-            where: {
-                id: ctx.session?.user.id
-            },
-            select: {
-                bookmarkQuota: true
-            }
-        })
-
-        //Return straight away. Do not deduct the quota.
-        if (quotas?.bookmarkQuota !== undefined && quotas?.bookmarkQuota <= 0) {
-            res = { result: "OUT_OF_BOOKMARK_QUOTA", message: "You have used up all your bookmark quota. Remove existing bookmarks to add more."}
-            return res
-        } else if (quotas?.bookmarkQuota === undefined) {
-            res = { result: "UNABLE_TO_RETRIEVE_QUOTA", message: "Error retrieving bookmarks quota. Please try again." }
-            return res 
-        }
+       
 
         //TODO: Check if there exists a previous save
         const existingSave = await prisma.savedSnippets.findMany({
@@ -112,6 +95,25 @@ export const dbRouter = createTRPCRouter({
         })
 
         if (existingSave.length === 0) {
+            //Check bookmark quota here
+            const quotas = await prisma.user.findUnique({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                select: {
+                    bookmarkQuota: true
+                }
+            })
+
+            //Return straight away. Do not deduct the quota.
+            if (quotas?.bookmarkQuota !== undefined && quotas?.bookmarkQuota <= 0) {
+                res = { result: "OUT_OF_BOOKMARK_QUOTA", message: "You have used up all your bookmark quota. Remove existing bookmarks to add more."}
+                return res
+            } else if (quotas?.bookmarkQuota === undefined) {
+                res = { result: "UNABLE_TO_RETRIEVE_QUOTA", message: "Error retrieving bookmarks quota. Please try again." }
+                return res 
+            }
+
             const snippet = await prisma.savedSnippets.create({
                 data: {
                     userId: input.userId,
@@ -119,28 +121,31 @@ export const dbRouter = createTRPCRouter({
                 },
             })
             console.log(snippet)
+
+            //Reduce bookmark quota here
+            //Finally, deduct quota
+            if (quotas && quotas.bookmarkQuota) {
+                const prevQuota: number = quotas.bookmarkQuota
+
+                const newQuota = prevQuota - 1
+                console.log(`${prevQuota} - 1 = ${newQuota}`)
+
+                await prisma.user.update({
+                    where: {
+                        id: ctx.session?.user.id
+                    },
+                    data: {
+                        bookmarkQuota: newQuota
+                    }
+                })
+            }
+
             res = { result: "SAVE_SUCCESS", message: `Verse successfully bookmarked. You have ${quotas.bookmarkQuota-1} bookmark quota remaining.` } //Modify toast to display quota
         } else {
             res = { result: "SAVE_EXISTS" }
         }
         
-        //Reduce bookmark quota here
-        //Finally, deduct quota
-        if (quotas && quotas.bookmarkQuota) {
-            const prevQuota: number = quotas.bookmarkQuota
-
-            const newQuota = prevQuota - 1
-            console.log(`${prevQuota} - 1 = ${newQuota}`)
-
-            await prisma.user.update({
-                where: {
-                    id: ctx.session?.user.id
-                },
-                data: {
-                    bookmarkQuota: newQuota
-                }
-            })
-        }
+        
         
         return res
     }),
@@ -347,25 +352,6 @@ export const dbRouter = createTRPCRouter({
         let snippetId = input.snippetId;
         let savePrefix = ""; //Prefix to prepend on addNoteResp result on successful save + add note
 
-        //Check bookmark quota here
-        const quotas = await prisma.user.findUnique({
-            where: {
-                id: ctx.session?.user.id
-            },
-            select: {
-                bookmarkQuota: true
-            }
-        })
-
-        //Return straight away. Do not deduct the quota.
-        if (quotas?.bookmarkQuota !== undefined && quotas?.bookmarkQuota <= 0) {
-            addNoteResp = { result: "OUT_OF_BOOKMARK_QUOTA", message: "You have used up all your bookmark quota. Remove existing bookmarks to add more."}
-            return addNoteResp
-        } else if (quotas?.bookmarkQuota === undefined) {
-            addNoteResp = { result: "UNABLE_TO_RETRIEVE_QUOTA", message: "Error retrieving bookmarks quota. Please try again." }
-            return addNoteResp
-        }
-
         //If snippetId is an empty string, save the snippet first.
         //At this stage, there is a huge loophole. If a user immediately adds a second note on an auto-saved verse, the verse will re-save.
         if (snippetId === "") {
@@ -383,6 +369,26 @@ export const dbRouter = createTRPCRouter({
             }) 
 
             if (redundantSaveResp === null) {
+
+                //Check bookmark quota here
+                const quotas = await prisma.user.findUnique({
+                    where: {
+                        id: ctx.session?.user.id
+                    },
+                    select: {
+                        bookmarkQuota: true
+                    }
+                })
+
+                //Return straight away. Do not deduct the quota.
+                if (quotas?.bookmarkQuota !== undefined && quotas?.bookmarkQuota <= 0) {
+                    addNoteResp = { result: "OUT_OF_BOOKMARK_QUOTA", message: "You have used up all your bookmark quota. Remove existing bookmarks to add more."}
+                    return addNoteResp
+                } else if (quotas?.bookmarkQuota === undefined) {
+                    addNoteResp = { result: "UNABLE_TO_RETRIEVE_QUOTA", message: "Error retrieving bookmarks quota. Please try again." }
+                    return addNoteResp
+                }
+
                 console.log("Verse have not been saved. Creating new save...")
                 const saveSnippetDbResp = await prisma.savedSnippets.create({
                     data: {
