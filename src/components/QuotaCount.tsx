@@ -1,6 +1,6 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import React, { useState, type FC } from 'react'
+import React, { useState, type FC, useEffect } from 'react'
 import { api } from '~/utils/api';
 
 interface QuotaCountProps {
@@ -8,6 +8,8 @@ interface QuotaCountProps {
 }
 
 const QuotaCount: FC<QuotaCountProps> = ({ setModalVisibleCallback }) => {
+
+    const [ localModalValue, setLocalModalValue ] = useState(false)
 
     let searchQuota = 0;
     let generateQuota = 0;
@@ -25,11 +27,11 @@ const QuotaCount: FC<QuotaCountProps> = ({ setModalVisibleCallback }) => {
 
             if (modalDisplayed === null || modalDisplayed === "false") { //If modal_displayed is false or undefined
                 setModalVisibleCallback(true)
-                localStorage.setItem("modal_displayed", "true")
-                //One more tRPC procedure to tell that the user has seen the Modal
+                
             }
         }
     }
+
 
     return (
         <>

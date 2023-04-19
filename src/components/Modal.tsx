@@ -15,12 +15,14 @@ const Modal: FC<ModalProps> = ({ setModalVisibleCallback }) => {
 
     const handleYesNotification = () => {
         const res = setNotificationApi.mutateAsync({ isNotify: true });
+        localStorage.setItem("modal_displayed", "true")
 
         setModalVisibleCallback(false);
     }
     
     const handleNoNotification = () => {
         const res = setNotificationApi.mutateAsync({ isNotify: false });
+        localStorage.setItem("modal_displayed", "true")
 
         setModalVisibleCallback(false);
     }

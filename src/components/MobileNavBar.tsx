@@ -6,19 +6,19 @@ import { useRouter } from 'next/router';
 import QuotaCount from './QuotaCount';
 import Modal from './Modal';
 
-const NavBar: FC = () => {
+const MobileNavBar: FC = () => {
   const { data: sessionData } = useSession();
   const { asPath } = useRouter();
 
-  const [ modalVisible, setModalVisible ] = useState(false);
-
+  const [ mobileModalVisible, setMobileModalVisible ] = useState(false);
+  
   return (
     <div className="flex w-full">
     {/* Top Nav */}
       <div className="fixed z-40 w-full top-0 bg-slate-200
        border-slate-500 border-b border-x justify-between rounded-b-3xl shadow-lg border-dashed h-12 items-center flex-row px-5 flex sm:hidden">
             <div className="">
-              <QuotaCount setModalVisibleCallback={setModalVisible}/>
+              <QuotaCount setModalVisibleCallback={setMobileModalVisible}/>
             </div>
             <div className="mr-0 text-xs flex flex-row gap-1 items-center justify-end w-2/3 font-zilla-slab">
                 {(sessionData) ? (<div className="text-xs mr-1 text-emerald-600">{sessionData.user.email}</div>) : (<></>)}
@@ -30,9 +30,9 @@ const NavBar: FC = () => {
                 </button>
             </div>
       </div>
-      {(modalVisible) ? 
+      {(mobileModalVisible) ? 
       (<div className="fixed sm:hidden w-full justify-center flex">
-        <Modal setModalVisibleCallback={setModalVisible}/>
+        <Modal setModalVisibleCallback={setMobileModalVisible}/>
       </div>) : 
       (<></>)}
     {/* Bottom Nav */}
@@ -52,4 +52,4 @@ const NavBar: FC = () => {
   )
 }
 
-export default NavBar;
+export default MobileNavBar;
