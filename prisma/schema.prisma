@@ -120,7 +120,7 @@ model UserNotes {
 
 model NotifyUser {
     id                  String @id @default(cuid())
-    userId              String
+    userId              String @unique
     user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
     modalDisplayed      Boolean @default(false)
     isInNotifyList      Boolean?
