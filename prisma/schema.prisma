@@ -64,6 +64,7 @@ model User {
     accounts        Account[]
     sessions        Session[]
     savedSnippets   SavedSnippets[]
+    notifyUser      NotifyUser[]   
     role            Role      @default(FREEUSER)
     searchQuota     Int       @default(7) //Need to refresh daily. Consider using AWS Lambda. Update to 40 if PREMIUMUSER.
     generateQuota   Int       @default(5) //Update to 20 and refresh daily if PREMIUMUSER. Consider using AWS Lambda.
@@ -115,4 +116,12 @@ model UserNotes {
     content             String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model NotifyUser {
+    id                  String @id @default(cuid())
+    userId              String
+    user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    modalDisplayed      Boolean @default(false)
+    isInNotifyList      Boolean?
 }
