@@ -474,8 +474,8 @@ export const dbRouter = createTRPCRouter({
     }),
 
     setUserNotification: protectedProcedure
-    .input(z.object({}))
-    .mutation(async ({ ctx }) => {
+    .input(z.object({ isNotify: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
 
         let res: RespT;
 
@@ -488,15 +488,21 @@ export const dbRouter = createTRPCRouter({
                 },
                 update: {
                     modalDisplayed: true,
-                    isInNotifyList: true
+                    isInNotifyList: input.isNotify
                 },
                 create: {
                     userId: userId,
                     modalDisplayed: true,
-                    isInNotifyList: true
+                    isInNotifyList: input.isNotify
                 }
             })
-            res = { result: "ADDED_USER_TO_NOTIFY_LIST" }
+
+            if (input.isNotify) {
+                res = { result: "UPDATE_YES_NOTIFY" }
+            } else {
+                res = { result: "UPDATE_NO_NOTIFY" }
+            }
+
         } else {
             res = { result: "USER_SESSION_INVALID" }
         }

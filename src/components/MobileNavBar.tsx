@@ -30,9 +30,11 @@ const NavBar: FC = () => {
                 </button>
             </div>
       </div>
-      <div className="fixed sm:hidden w-full justify-center flex">
-          <Modal setModalVisibleCallback={setModalVisible}/>
-      </div>
+      {(modalVisible) ? 
+      (<div className="fixed sm:hidden w-full justify-center flex">
+        <Modal setModalVisibleCallback={setModalVisible}/>
+      </div>) : 
+      (<></>)}
     {/* Bottom Nav */}
       <div className="fixed z-40 w-full bottom-0 bg-slate-50 border-slate-500 border-t border-x rounded-t-3xl shadow-lg border-dashed h-12 items-center grid grid-cols-3 flex-row px-2 sm:hidden transition-all">
         <Link className={`w-full h-full grid items-center justify-center rounded-full ${(asPath==="/") ? ("bg-slate-200 shadow-inner h-3/4"): ("")}`} href="/">

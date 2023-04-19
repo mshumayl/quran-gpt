@@ -10,13 +10,20 @@ interface ModalProps {
 
 
 const Modal: FC<ModalProps> = ({ setModalVisibleCallback }) => {
+    
+    const setNotificationApi = api.db.setUserNotification.useMutation();
 
-    //Notify Handler
-        //Call tRPC method
-        //setModalVisibleCallback(false);
+    const handleYesNotification = () => {
+        const res = setNotificationApi.mutateAsync({ isNotify: true });
 
-    //NoThanks Handler
-        //setModalVisibleCallback(false);
+        setModalVisibleCallback(false);
+    }
+    
+    const handleNoNotification = () => {
+        const res = setNotificationApi.mutateAsync({ isNotify: false });
+
+        setModalVisibleCallback(false);
+    }
 
     return (
         <div className="fixed w-11/12 h-fit sm:w-5/6 md:w-4/5 lg:w-1/2 top-72 bg-white shadow-2xl rounded-2xl border border-dashed border-slate-400 p-10 justify-center content-center">
@@ -24,8 +31,8 @@ const Modal: FC<ModalProps> = ({ setModalVisibleCallback }) => {
             <div className="font-zilla-slab text-slate-600 text-md md:text-lg flex justify-center mt-8">However, we have good news! AI-Daleel Premium subscription is coming soon, which will provide you with more AI Search and AI Generate quotas.</div>
             <div className="font-zilla-slab text-slate-600 text-md md:text-lg flex justify-center mt-5">Would you like to be notified when the Premium subscription is available? Keep up-to-date and never miss out on the latest features!</div>
             <div className="grid justify-center mt-8 gap-2">
-                <button className="justify-center text-md md:text-lg text-white font-jost bg-emerald-400 hover:bg-emerald-500 py-1 px-2 rounded-lg">Notify Me</button>
-                <button className="justify-center text-sm md:text-md text-slate-500 font-zilla-slab-italic">No Thanks</button>
+                <button onClick={handleYesNotification} className="justify-center text-md md:text-lg text-white font-jost bg-emerald-400 hover:bg-emerald-500 py-1 px-2 rounded-lg">Notify Me</button>
+                <button onClick={handleNoNotification} className="justify-center text-sm md:text-md text-slate-500 font-zilla-slab-italic mt-4">No Thanks</button>
             </div>
         </div>
     );

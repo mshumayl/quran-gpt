@@ -20,7 +20,7 @@ const QuotaCount: FC<QuotaCountProps> = ({ setModalVisibleCallback }) => {
         generateQuota = quotas.data.generateQuota;
         bookmarkQuota = quotas.data.bookmarkQuota;
 
-        if (searchQuota !== 0 && generateQuota !== 0 && bookmarkQuota !== 0) {
+        if (searchQuota === 0 && generateQuota === 0) {
             const modalDisplayed = localStorage.getItem("modal_displayed")
 
             if (modalDisplayed === null || modalDisplayed === "false") { //If modal_displayed is false or undefined
