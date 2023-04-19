@@ -11,6 +11,8 @@ import { api } from '~/utils/api';
 // Dynamic import with SSR: false to avoid hydration issues. Refer to https://github.com/mshumayl/quran-gpt/issues/7.
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import Toaster from './Toaster';
 const VerseCard = dynamic(() => import("./VerseCard"), {ssr: false})
 
 const PromptInput: FC = ({  }) => {
@@ -26,6 +28,8 @@ const PromptInput: FC = ({  }) => {
   const [inputLength, setInputLength] = useState<number>(0);
   const [placeholderIndex, setPlaceholderIndex] = useState<number>(0);
   const [displayLoader, setDisplayLoader] = useState<boolean>(false);
+  const [toasterResult, setToasterResult] = useState<string>("");
+  const [toasterMessage, setToasterMessage] = useState<string>("");
   const [aiResponse, setAiResponse] = useState<responseType>(() => {
     // Assign cachedResponse if useState is being run on client-side
     const cachedResponse = (
@@ -41,19 +45,62 @@ const PromptInput: FC = ({  }) => {
 
   const submitApi = api.openai.submitPrompt.useMutation();
 
-  
+  const { data: session } = useSession(); // To get quota
+
+  //Reset toaster after timeout
+  useEffect(() => {
+    console.log(toasterResult)
+    if (toasterResult !== "") {
+      const timeout = setTimeout(() => {
+        setToasterResult("")
+      }, 4000)
+      return () => clearTimeout(timeout)
+    }
+  }, [toasterResult])
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    setDisplayLoader((prevState) => !prevState);
     e.preventDefault();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    const res = await submitApi.mutateAsync({ userPrompt: inputValue });
-    const json = JSON.parse(res.response.replace(/[\n\r]/g, ''));
+    //Check quota. useSession is only run on page refresh, so newly exhausted quotas can only be checked on server-side.
+    if (session?.user.searchQuota !== 0) {
+      setDisplayLoader((prevState) => !prevState);
 
-    setAiResponse(json);
-    setDisplayLoader((prevState) => !prevState);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      //TODO: Once there is a proper response object for submitPrompt, remove the eslint escape above
+      const res = await submitApi.mutateAsync({ userPrompt: inputValue });
+  
+      if (res.result === "SEARCH_SUCCESS" && res.respObj !== undefined) {
+        
+        setAiResponse(res.respObj);
+
+        setToasterResult(res.result);
+        setToasterMessage(res.message);
+
+      } else if (res.result && res.message) {
+
+        setToasterResult(res.result);
+        setToasterMessage(res.message);
+
+      } else {
+
+        const result = "UNEXPECTED"
+        const message = "Unexpected input. Please try again."
+        setToasterResult(result);
+        setToasterMessage(message);
+
+      }
+
+      setDisplayLoader((prevState) => !prevState);
+      
+    } else {
+
+      const result = "NO_SEARCH_QUOTA"
+      const message = "You have run out of search quota for the day. Please try again tomorrow."
+      setToasterResult(result);
+      setToasterMessage(message);
+
+    }
   }
-
 
   const handleClear = () => {
     setAiResponse(defaultResponse);
@@ -119,6 +166,7 @@ const PromptInput: FC = ({  }) => {
               }}>
               </textarea>
               <div className="text-end mx-2 my-1 text-xs text-slate-400">{inputLength}/{maxInputLength}</div>
+              {/* Submit button */}
               <button type="submit" className="transition-all m-10 p-2 flex flex-col items-center bg-emerald-400 
               rounded-lg border border-dashed border-emerald-600 
               hover:bg-emerald-300 active:bg-emerald-200 text-md 
@@ -131,6 +179,7 @@ const PromptInput: FC = ({  }) => {
               </button>
         </form>
         
+        {/* Clear results button */}
         {(aiResponse.length === 3) 
         ? (<button onClick={handleClear} className="underline underline-offset-2 flex flex-col items-center text-sm font-zilla-slab-italic text-slate-600 hover:text-emerald-500">Clear results</button>) 
         : (<></>)}
@@ -150,6 +199,10 @@ const PromptInput: FC = ({  }) => {
               );}
             )}
         </ul>
+
+        <div className="z-50">
+          <Toaster status={toasterResult} message={toasterMessage}/>
+        </div>
     </>
   )
 }

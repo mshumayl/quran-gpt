@@ -37,6 +37,7 @@ const Bookmarks = () => {
     }[] | undefined
       
     const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
+    const [ bookmarkMessage, setBookmarkMessage ] = useState("") 
 
     useEffect(() => {
       if (bookmarkResult !== "") {
@@ -80,7 +81,9 @@ const Bookmarks = () => {
             <link rel="icon" href="/ai-daleel.ico" />
           </Head>
           <main className="flex flex-col items-center min-h-screen min-w-fit bg-slate-100">
-            <NavBar/><MobileNavBar/>
+            <div className="w-full z-40">
+              <NavBar/><MobileNavBar/>
+            </div>
             <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
               <div className="font-jost text-emerald-500 text-3xl md:text-6xl">
                 Bookmarked Verses
@@ -89,7 +92,7 @@ const Bookmarks = () => {
                  {(savedVerses && savedVerses.map && savedVerses.map(({ surah, verse, uid }) => {
                   return ((surah !== undefined && verse !== undefined) ? 
                     (
-                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid} setToasterResult={setBookmarkResult}/>
+                      <VerseCard surah={parseInt(surah)} verse={parseInt(verse)} uid={uid} setBookmarkResultCallback={setBookmarkResult} setBookmarkMessageCallback={setBookmarkMessage}/>
                     )
                     : (<></>)
                   )
@@ -103,7 +106,7 @@ const Bookmarks = () => {
                 </>) 
               : (<></>)}
               <div className="z-50">
-                <Toaster status={bookmarkResult}/>
+                <Toaster status={bookmarkResult} message={bookmarkMessage}/>
               </div>
             </div>
           </main>

@@ -33,6 +33,7 @@ const Main: NextPage = () => {
   const { query } = useRouter();
 
   const [ bookmarkResult, setBookmarkResult ] = useState("") //Pass setBookmarkResult as callback into child (VerseCard)
+  const [ bookmarkMessage, setBookmarkMessage ] = useState("") //Pass setBookmarkMessage as callback into child () 
   const { data: session } = useSession();
 
   const [ verseTranslation, setVerseTranslation ] = useState("");
@@ -73,7 +74,9 @@ const Main: NextPage = () => {
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">
-        <NavBar/><MobileNavBar/>
+        <div className="w-full z-40">
+          <NavBar/><MobileNavBar/>
+        </div>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
           <div className="font-jost text-emerald-500 text-3xl md:text-6xl">
             Verse Details
@@ -83,8 +86,9 @@ const Main: NextPage = () => {
             surah={parseInt(surah)} 
             verse={parseInt(verse)} 
             isDetailed={true} 
-            setToasterResult={setBookmarkResult}
-            setVerseTranslation={setVerseTranslation}/>) : (<></>)} 
+            setBookmarkResultCallback={setBookmarkResult}
+            setBookmarkMessageCallback={setBookmarkMessage}
+            setVerseTranslationCallback={setVerseTranslation}/>) : (<></>)} 
           </div>
         </div>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
@@ -93,7 +97,7 @@ const Main: NextPage = () => {
           </div>
         </div>
         <div className="z-50">
-          <Toaster status={bookmarkResult}/>
+          <Toaster status={bookmarkResult} message={bookmarkMessage}/>
         </div>
       </main>
     </>

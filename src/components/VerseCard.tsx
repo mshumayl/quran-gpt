@@ -14,11 +14,12 @@ interface VerseCardProps {
   verse: number;
   isDetailed?: boolean;
   uid?: string; //Unique ID for table savedSnippets in db. Only available for saved snippets.
-  setToasterResult?:  React.Dispatch<React.SetStateAction<string>>; //Callback function to update state in parent component. Parent can be savedVerses or [surahVerse].
-  setVerseTranslation?: React.Dispatch<React.SetStateAction<string>>;
+  setBookmarkResultCallback?:  React.Dispatch<React.SetStateAction<string>>; //Callback function to update state in parent component. Parent can be savedVerses or [surahVerse].
+  setBookmarkMessageCallback?: React.Dispatch<React.SetStateAction<string>>;
+  setVerseTranslationCallback?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToasterResult, setVerseTranslation }) => {
+const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setBookmarkResultCallback, setBookmarkMessageCallback, setVerseTranslationCallback }) => {
 
   type responseType = {
       surahName: string | undefined;
@@ -34,30 +35,57 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
 
   const saveApi = api.db.saveSnippet.useMutation();
   const handleSave = async () => {
-    if (session) {
-      const saveRes = await saveApi.mutateAsync({ verseId: `${surah}_${verse}`, userId: session?.user.id });
-      console.log(saveRes);
 
-      //If callback function is passed as prop
-      if (setToasterResult) {
-        setToasterResult(saveRes);
+    if (session && session?.user.bookmarkQuota !== 0) {
+      const res = await saveApi.mutateAsync({ verseId: `${surah}_${verse}`, userId: session?.user.id });
+
+      if (res.result === "SAVE_SUCCESS" && res.message) {
+        //If callback function is passed as prop
+        if (setBookmarkResultCallback && setBookmarkMessageCallback) {
+          setBookmarkResultCallback(res.result);
+          setBookmarkMessageCallback(res.message);
+        }
+      } else if (res.result === "SAVE_EXISTS") {
+        if (setBookmarkResultCallback) {
+          setBookmarkResultCallback(res.result);
+        }
+      } else if (res.result && res.message) {
+        if (setBookmarkResultCallback && setBookmarkMessageCallback) {
+          setBookmarkResultCallback(res.result);
+          setBookmarkMessageCallback(res.message);
+          console.log("Remove bookmark woi!")
+        }
+      } else {
+        if (setBookmarkResultCallback && setBookmarkMessageCallback) {
+          const message = "Bookmark failed. Please try again.";
+          setBookmarkResultCallback(res.result);
+          setBookmarkMessageCallback(message);
+        }
+      }
+    } else {
+      //BUG: TODO: This should not display if the user has already bookmarked this. Deferring bug fix to another time.
+      const message = "You are out of bookmarks quota. Remove existing bookmarks to add more."
+      const result = "OUT_OF_BOOKMARK_QUOTA"
+      if (setBookmarkResultCallback && setBookmarkMessageCallback) {
+        setBookmarkResultCallback(result);
+        setBookmarkMessageCallback(message);
       }
 
-    } else {
-      console.log("Unable to save. Please log in.")
+      console.log(result, message)
     }
   }
 
   const deleteApi = api.db.removeSnippet.useMutation();
   const handleDelete = async () => {
 
+    //Addition in API, not reduction
     if (session && uid) {
-      const deleteRes = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
-      console.log(deleteRes);
+      const res = await deleteApi.mutateAsync({ id: uid, verseId: `${surah}_${verse}`, userId: session?.user.id })
 
       //If callback function is passed as prop
-      if (setToasterResult) {
-        setToasterResult(deleteRes);
+      if (setBookmarkResultCallback && setBookmarkMessageCallback && res.message) {
+        setBookmarkResultCallback(res.result);
+        setBookmarkMessageCallback(res.message);
       }
       
       setFetchedData(undefined);
@@ -76,8 +104,8 @@ const VerseCard: FC<VerseCardProps> = ({ surah, verse, isDetailed, uid, setToast
       setFetchedData(dbFetch);
 
       //Only to return to [surahVerse] to pass into OpenAI to generate notes (generateNote)
-      if (setVerseTranslation !== undefined && dbFetch.verseTranslation) {
-        setVerseTranslation(dbFetch.verseTranslation);
+      if (setVerseTranslationCallback !== undefined && dbFetch.verseTranslation) {
+        setVerseTranslationCallback(dbFetch.verseTranslation);
       }
 
       setLoader(false);

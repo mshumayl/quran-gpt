@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { type Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
 import React, { useState, useEffect, type FC, type FormEvent, useRef } from 'react'
 import { api } from '~/utils/api';
+import Toaster from './Toaster';
 
 interface NotesProps {
     userId: string;
@@ -11,9 +14,13 @@ interface NotesProps {
 }
 
 interface AIGenerateNoteButtonProps {
-  CallbackFn: React.Dispatch<React.SetStateAction<string>>;
+  setNewNoteValueCallback: React.Dispatch<React.SetStateAction<string>>;
+  setToasterResultCallback: React.Dispatch<React.SetStateAction<string>>;
+  setToasterMessageCallback: React.Dispatch<React.SetStateAction<string>>;
   verseId: string;
   verseTranslation: string;
+  session: Session | null;
+  
 }
 
 type savedNoteType = {
@@ -31,27 +38,62 @@ const SubmitNoteButton: FC = () => {
   )
 }
 
-const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ CallbackFn, verseId, verseTranslation }) => {
+const AIGenerateNoteButton: FC<AIGenerateNoteButtonProps> = ({ 
+  setNewNoteValueCallback,
+  setToasterResultCallback,
+  setToasterMessageCallback,
+  verseId, 
+  verseTranslation, 
+  session }) => {
 
   const [ AiGenerateNoteLoader, setAiGenerateNoteLoader ] = useState(false);
-
   const [surahNumber, verseNumber] = verseId.split("_");
-  let res: { result: string; message?: string | undefined; };
+
+  let res: { result: string; message?: string, data?: string };
 
   const aiGenerateNoteApi = api.openai.generateNote.useMutation();
 
   const handleAiGenerate = async () => {
+
     setAiGenerateNoteLoader((previous) => !previous)
+    
+    if (session?.user?.generateQuota && session?.user?.generateQuota > 0) {
+      //Fetch
+      if (surahNumber && verseNumber) {
+        res = await aiGenerateNoteApi.mutateAsync({ surahNumber: surahNumber, verseNumber: verseNumber, verseTranslation: verseTranslation })
+      }
 
-    //Fetch
-    if (surahNumber && verseNumber) {
-      res = await aiGenerateNoteApi.mutateAsync({ surahNumber: surahNumber, verseNumber: verseNumber, verseTranslation: verseTranslation })
-    }
+      if (res.result === "AI_RESPONSE_RECEIVED" && res.data && res.message) {
+        
+        setNewNoteValueCallback(res.data)
 
-    if (res.result === "AI_RESPONSE_RECEIVED" && res.message !== undefined) {
-      CallbackFn(res.message)
+        setToasterResultCallback(res.result);
+        setToasterMessageCallback(res.message);
+      
+      } else if (res.result === "OUT_OF_GENERATE_QUOTA" && res.message) {
+
+        setToasterResultCallback(res.result);
+        setToasterMessageCallback(res.message);
+        console.log(res.result, res.message);
+        //Consider triggering modal here.
+
+      } else if (res.result && res.message) {
+
+        setToasterResultCallback(res.result);
+        setToasterMessageCallback(res.message);
+        console.log(res.result, res.message)
+
+      }
+
     } else {
-      console.log(res.result)
+
+      const result = "NO_GENERATE_QUOTA"
+      const message = "You have run out of AI Generate quota."
+      setToasterResultCallback(result);
+      setToasterMessageCallback(message);
+
+      setNewNoteValueCallback("")
+    
     }
 
     setAiGenerateNoteLoader((previous) => !previous)
@@ -77,7 +119,11 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
 
   const [ savedNoteValue, setSavedNoteValue ] = useState<savedNoteType>([{}]);
   const [ newNoteValue, setNewNoteValue ] = useState(""); //This is used to decide whether or not to render submit button
+  const [toasterResult, setToasterResult] = useState<string>("");
+  const [toasterMessage, setToasterMessage] = useState<string>("");
   const newNoteRef = useRef<HTMLFormElement>(null);
+
+  const { data: session } = useSession();
 
   let snippetId = "";
 
@@ -89,6 +135,17 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
 
   const getNotesApi = api.db.getNotes.useMutation()
   
+  //Reset toaster after timeout
+  useEffect(() => {
+    console.log(toasterResult)
+    if (toasterResult !== "") {
+      const timeout = setTimeout(() => {
+        setToasterResult("")
+      }, 4000)
+      return () => clearTimeout(timeout)
+    }
+  }, [toasterResult])
+
   //This useEffect runs on page load. A function will useQuery to get all saved notes.
   //If result set is not empty, update savedNoteValue with result set.
   useEffect(() => {
@@ -119,43 +176,61 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
   const handleNewNote = async (event: FormEvent) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     event.preventDefault();
-    
-    //Append newNoteValue to savedNoteValue array
-    setSavedNoteValue(previous => [...previous, {note: newNoteValue}])
 
-    if (newNoteRef.current !== null) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      newNoteRef.current.reset();
-      setNewNoteValue("");
-    }
+    if (newNoteValue !== "") {
+      //Append newNoteValue to savedNoteValue array
+      setSavedNoteValue(previous => [...previous, {note: newNoteValue}])
 
-    //Send newNoteValue to addNote API (which is possible as the procedure can defined first before running mutateAsync.)
-    const res = await submitNoteApi.mutateAsync({ 
-      userId: userId, 
-      snippetId: snippetId,
-      verseId: verseId, 
-      content: newNoteValue 
-    });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    console.log(res)
-
-    //This async function is required as await can only be run inside an async function, but useEffect cannot be async.
-    //This is the exact same function used in the useEffect above. It is used here to refetch the content with date and ID.
-    async function getNotesFetcher() {
-      const dbNotes = await getNotesApi.mutateAsync({ userId: userId, snippetId: snippetId })
-      
-      if ( dbNotes?.result === "NOTES_RETRIEVED" ) {
-          const contents = dbNotes?.data?.map(({ id, content, createdAt }) => {
-            return { id: id, note: content, saveTime: createdAt }
-          })
-
-          if (contents !== undefined) {
-            setSavedNoteValue(contents)
-          }
+      if (newNoteRef.current !== null) {
+        console.log("newNoteRef")
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        newNoteRef.current.reset();
+        setNewNoteValue("");
       }
-    }
 
-    void getNotesFetcher();
+      //Send newNoteValue to addNote API (which is possible as the procedure can defined first before running mutateAsync.)
+      const res = await submitNoteApi.mutateAsync({ 
+        userId: userId, 
+        snippetId: snippetId,
+        verseId: verseId, 
+        content: newNoteValue 
+      });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      console.log(res)
+      
+      //This async function is required as await can only be run inside an async function, but useEffect cannot be async.
+      //This is the exact same function used in the useEffect above. It is used here to refetch the content with date and ID.
+      async function getNotesFetcher() {
+        const dbNotes = await getNotesApi.mutateAsync({ userId: userId, snippetId: snippetId })
+        
+        if (dbNotes?.result === "NOTES_RETRIEVED") {
+            const contents = dbNotes?.data?.map(({ id, content, createdAt }) => {
+              return { id: id, note: content, saveTime: createdAt }
+            })
+
+            if (contents !== undefined) {
+              setSavedNoteValue(contents)
+            }
+        } 
+      }
+
+      if (res.result === "OUT_OF_BOOKMARK_QUOTA" && res.message) {
+        //Remove last value
+        const originalArray = savedNoteValue.slice(0, savedNoteValue.length - 1)
+        console.log("savedNoteValue", savedNoteValue)
+        console.log("originalArray", originalArray)
+        setSavedNoteValue([...originalArray])
+        
+        setToasterResult(res.result);
+        setToasterMessage(res.message);
+
+        //set Toast
+        console.log("Toast message: ", res?.message)
+      } else {
+        void getNotesFetcher();
+      }
+
+    }
   }
 
   const deleteNoteApi = api.db.deleteNote.useMutation();
@@ -215,7 +290,13 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
               </textarea>
               <div className="content-end h-7 grid justify-items-end">
                 {(newNoteValue.length === 0) 
-                && (<AIGenerateNoteButton CallbackFn={setNewNoteValue} verseId={verseId} verseTranslation={verseTranslation}/>)}
+                && (<AIGenerateNoteButton 
+                setNewNoteValueCallback={setNewNoteValue}
+                setToasterResultCallback={setToasterResult}
+                setToasterMessageCallback={setToasterMessage}
+                verseId={verseId} 
+                verseTranslation={verseTranslation}
+                session={session}/>)}
               </div>
           </div>
           <div className="h-7 grid justify-items-end">
@@ -240,6 +321,9 @@ const Notes: FC<NotesProps> = ({ userId, verseId, verseTranslation }) => {
               </div>)
             }
           })}
+        </div>
+        <div className="z-50">
+          <Toaster status={toasterResult} message={toasterMessage}/>
         </div>
     </div>
   )

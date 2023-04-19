@@ -3,6 +3,7 @@
 
 generator client {
     provider = "prisma-client-js"
+    previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -13,6 +14,13 @@ datasource db {
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url       = env("DATABASE_URL")
     directUrl = env("DATABASE_DIRECT_URL")
+}
+
+enum Role {
+    FREEUSER
+    PREMIUMUSER
+    ADMIN
+    SUPERADMIN
 }
 
 model Example {
@@ -49,14 +57,20 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    savedSnippets SavedSnippets[]
+    id              String    @id @default(cuid())
+    name            String?
+    email           String?   @unique
+    emailVerified   DateTime?
+    image           String?
+    accounts        Account[]
+    sessions        Session[]
+    savedSnippets   SavedSnippets[]
+    notifyUser      NotifyUser[]   
+    role            Role      @default(FREEUSER)
+    searchQuota     Int       @default(7) //Need to refresh daily. Consider using AWS Lambda. Update to 40 if PREMIUMUSER.
+    generateQuota   Int       @default(5) //Update to 20 and refresh daily if PREMIUMUSER. Consider using AWS Lambda.
+    bookmarkQuota   Int       @default(5) //Need to refresh daily. Consider using AWS Lambda. 100 if PREMIUMUSER.
+    //noteQuota needs to be calculated on client-side, based on the note count on that specific snippetId. Unlimited if PREMIUMUSER.
 }
 
 model VerificationToken {
@@ -103,4 +117,12 @@ model UserNotes {
     content             String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model NotifyUser {
+    id                  String @id @default(cuid())
+    userId              String @unique
+    user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    modalDisplayed      Boolean @default(false)
+    isInNotifyList      Boolean?
 }

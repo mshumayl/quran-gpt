@@ -15,6 +15,7 @@ import {
 //Response type -- to make it easier and more standardized for client to parse.
 type RespT = {
     result: string;
+    message?: string;
 }
 
 export const dbRouter = createTRPCRouter({
@@ -79,7 +80,11 @@ export const dbRouter = createTRPCRouter({
 
     saveSnippet: protectedProcedure
     .input(z.object( { verseId: z.string(), userId: z.string() } ))
-    .mutation(async ( { input } ) => {
+    .mutation(async ({ ctx, input }) => {
+
+        let res: RespT;
+
+       
 
         //TODO: Check if there exists a previous save
         const existingSave = await prisma.savedSnippets.findMany({
@@ -90,6 +95,25 @@ export const dbRouter = createTRPCRouter({
         })
 
         if (existingSave.length === 0) {
+            //Check bookmark quota here
+            const quotas = await prisma.user.findUnique({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                select: {
+                    bookmarkQuota: true
+                }
+            })
+
+            //Return straight away. Do not deduct the quota.
+            if (quotas?.bookmarkQuota !== undefined && quotas?.bookmarkQuota <= 0) {
+                res = { result: "OUT_OF_BOOKMARK_QUOTA", message: "You have used up all your bookmark quota. Remove existing bookmarks to add more."}
+                return res
+            } else if (quotas?.bookmarkQuota === undefined) {
+                res = { result: "UNABLE_TO_RETRIEVE_QUOTA", message: "Error retrieving bookmarks quota. Please try again." }
+                return res 
+            }
+
             const snippet = await prisma.savedSnippets.create({
                 data: {
                     userId: input.userId,
@@ -97,16 +121,51 @@ export const dbRouter = createTRPCRouter({
                 },
             })
             console.log(snippet)
-            return (`SAVE_SUCCESS`)
+
+            //Reduce bookmark quota here
+            //Finally, deduct quota
+            if (quotas && quotas.bookmarkQuota) {
+                const prevQuota: number = quotas.bookmarkQuota
+
+                const newQuota = prevQuota - 1
+                console.log(`${prevQuota} - 1 = ${newQuota}`)
+
+                await prisma.user.update({
+                    where: {
+                        id: ctx.session?.user.id
+                    },
+                    data: {
+                        bookmarkQuota: newQuota
+                    }
+                })
+            }
+
+            res = { result: "SAVE_SUCCESS", message: `Verse successfully bookmarked. You have ${quotas.bookmarkQuota-1} bookmark quota remaining.` } //Modify toast to display quota
         } else {
-            return (`SAVE_EXISTS`)
+            res = { result: "SAVE_EXISTS" }
         }
+        
+        
+        
+        return res
     }),
 
     removeSnippet: protectedProcedure
     .input(z.object( { verseId: z.string(), userId: z.string(), id: z.string() } ))
-    .mutation(async ( { input } ) => {
+    .mutation(async ({ ctx, input }) => {
         
+        let res: RespT;
+
+        //Get bookmarkQuota, no need to do any checking
+        const quotas = await prisma.user.findUnique({
+            where: {
+                id: ctx.session?.user.id
+            },
+            select: {
+                bookmarkQuota: true
+            }
+        })
+
         //Using deleteMany instead of delete to check all params for extra safety
         const deleteSnippet = await prisma.savedSnippets.deleteMany({
             where: {
@@ -118,8 +177,30 @@ export const dbRouter = createTRPCRouter({
             },
         })
 
-        console.log(deleteSnippet)
-        return (`REMOVE_SUCCESSFUL`)
+        if (deleteSnippet && quotas) {
+            res = { result: "REMOVE_SUCCESSFUL", message: `Verse bookmark removed. You have ${quotas.bookmarkQuota+1} bookmark quota remaining.` }
+        } else {
+            res = { result: "SAVED_VERSE_NOT_FOUND"}
+        }
+
+        //Perform quota addition
+        if (quotas) {
+            const prevQuota: number = quotas.bookmarkQuota
+
+            const newQuota = prevQuota + 1
+            console.log(`${prevQuota} + 1 = ${newQuota}`)
+
+            await prisma.user.update({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                data: {
+                    bookmarkQuota: newQuota
+                }
+            })
+        }
+
+        return res
     }),
 
     fetchUserSavedSnippets: protectedProcedure
@@ -265,7 +346,7 @@ export const dbRouter = createTRPCRouter({
 
     addNote: protectedProcedure
     .input(z.object({ snippetId: z.string(), userId: z.string(), verseId: z.string(), content: z.string() }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
 
         let addNoteResp: RespT;
         let snippetId = input.snippetId;
@@ -288,6 +369,26 @@ export const dbRouter = createTRPCRouter({
             }) 
 
             if (redundantSaveResp === null) {
+
+                //Check bookmark quota here
+                const quotas = await prisma.user.findUnique({
+                    where: {
+                        id: ctx.session?.user.id
+                    },
+                    select: {
+                        bookmarkQuota: true
+                    }
+                })
+
+                //Return straight away. Do not deduct the quota.
+                if (quotas?.bookmarkQuota !== undefined && quotas?.bookmarkQuota <= 0) {
+                    addNoteResp = { result: "OUT_OF_BOOKMARK_QUOTA", message: "You have used up all your bookmark quota. Remove existing bookmarks to add more."}
+                    return addNoteResp
+                } else if (quotas?.bookmarkQuota === undefined) {
+                    addNoteResp = { result: "UNABLE_TO_RETRIEVE_QUOTA", message: "Error retrieving bookmarks quota. Please try again." }
+                    return addNoteResp
+                }
+
                 console.log("Verse have not been saved. Creating new save...")
                 const saveSnippetDbResp = await prisma.savedSnippets.create({
                     data: {
@@ -298,6 +399,26 @@ export const dbRouter = createTRPCRouter({
     
                 snippetId = saveSnippetDbResp.id
                 savePrefix = "SAVE_AND_"
+
+                //Bookmark reduction logic here
+                //Reduce bookmark quota here
+                //Finally, deduct quota
+                if (quotas && quotas.bookmarkQuota) {
+                    const prevQuota: number = quotas.bookmarkQuota
+
+                    const newQuota = prevQuota - 1
+                    console.log(`${prevQuota} - 1 = ${newQuota}`)
+
+                    await prisma.user.update({
+                        where: {
+                            id: ctx.session?.user.id
+                        },
+                        data: {
+                            bookmarkQuota: newQuota
+                        }
+                    })
+                }
+
             } else {
                 console.log("Verse previously saved. Skipping to save note.")
                 snippetId = redundantSaveResp.id
@@ -329,5 +450,108 @@ export const dbRouter = createTRPCRouter({
         }
         
         return addNoteResp
+    }),
+
+    getQuotas: protectedProcedure
+    .input(z.object({}))
+    .query(async ({ ctx }) => {
+        
+        interface getQuotasRespT extends RespT {
+            data: {
+                searchQuota: number;
+                generateQuota: number;
+                bookmarkQuota: number;
+            }
+        }
+        
+        let res: getQuotasRespT;
+
+        //Check bookmark quota here
+
+        try {
+            const quotas = await prisma.user.findUnique({
+                where: {
+                    id: ctx.session?.user.id
+                },
+                select: {
+                    searchQuota: true,
+                    generateQuota: true,
+                    bookmarkQuota: true,
+                }
+            })
+
+            if (quotas) {
+                
+                res = {
+                    result: "QUOTAS_OBTAINED",
+                    data: {
+                        searchQuota: quotas?.searchQuota,
+                        generateQuota: quotas?.generateQuota,
+                        bookmarkQuota: quotas?.bookmarkQuota
+                    }
+                }        
+
+            } else {
+                
+                res = {
+                    result: "QUOTAS_NOT_FOUND",
+                    data: {
+                        searchQuota: 0,
+                        generateQuota: 0,
+                        bookmarkQuota: 0
+                    }
+                }
+
+            }
+            
+        } catch (e) {
+            res = {
+                result: "QUOTAS_NOT_FOUND",
+                data: {
+                    searchQuota: 0,
+                    generateQuota: 0,
+                    bookmarkQuota: 0
+                }
+            }
+        }
+        
+        return res
+    }),
+
+    setUserNotification: protectedProcedure
+    .input(z.object({ isNotify: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+
+        let res: RespT;
+
+        const userId = ctx.session.user.id;
+
+        if (userId) {
+            const upsertUserNotification = await prisma.notifyUser.upsert({
+                where: {
+                    userId: userId,
+                },
+                update: {
+                    modalDisplayed: true,
+                    isInNotifyList: input.isNotify
+                },
+                create: {
+                    userId: userId,
+                    modalDisplayed: true,
+                    isInNotifyList: input.isNotify
+                }
+            })
+
+            if (input.isNotify) {
+                res = { result: "UPDATE_YES_NOTIFY" }
+            } else {
+                res = { result: "UPDATE_NO_NOTIFY" }
+            }
+
+        } else {
+            res = { result: "USER_SESSION_INVALID" }
+        }
+        
+        return res
     })
 });

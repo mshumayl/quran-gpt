@@ -8,10 +8,11 @@ import Link from "next/link";
 // import { api } from "~/utils/api";
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
+import { getSession } from "next-auth/react";
 
 const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
+  
   return (
     <>
       <Head>
@@ -20,7 +21,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">
-        <NavBar/><MobileNavBar/>
+        <div className="w-full z-40">
+          <NavBar/><MobileNavBar/>
+        </div>
         <div className="flex flex-col items-center justify-center py-20">
           <div className="flex flex-col bg-[url('/graph-paper.svg')] bg-slate-50 drop-shadow-lg pb-20 pt-14 border-t-2 border-b-2 border-emerald-500 w-full justify-center items-center">
             <div className="flex flex-row text-6xl md:text-9xl items-center">

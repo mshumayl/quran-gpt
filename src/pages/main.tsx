@@ -24,7 +24,6 @@ export async function getServerSideProps(context: GetSessionParams | undefined) 
 
 const Main: NextPage = () => {
 
-
   return (
     <>
       <Head>
@@ -33,7 +32,9 @@ const Main: NextPage = () => {
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">
-        <NavBar/><MobileNavBar/>
+        <div className="w-full z-40">
+          <NavBar/><MobileNavBar/>
+        </div>
         <div className="flex flex-col w-full items-center gap-2 px-4 py-16">
           <div className="flex flex-row">
             <div className="flex align-baseline">
@@ -49,7 +50,7 @@ const Main: NextPage = () => {
           <div className="text-center text-sm md:text-md font-zilla-slab tracking-wide text-slate-400">
             AI-powered al-Quran research companion
           </div>
-          <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center">
+          <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center ">
               {/* TODO: Pass session object into PromptInput into VerseCard */}
               <PromptInput/>
           </div>
