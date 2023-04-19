@@ -471,5 +471,36 @@ export const dbRouter = createTRPCRouter({
         }
         
         return res
+    }),
+
+    setUserNotification: protectedProcedure
+    .input(z.object({}))
+    .mutation(async ({ ctx }) => {
+
+        let res: RespT;
+
+        const userId = ctx.session.user.id;
+
+        if (userId) {
+            const upsertUserNotification = await prisma.notifyUser.upsert({
+                where: {
+                    userId: userId,
+                },
+                update: {
+                    modalDisplayed: true,
+                    isInNotifyList: true
+                },
+                create: {
+                    userId: userId,
+                    modalDisplayed: true,
+                    isInNotifyList: true
+                }
+            })
+            res = { result: "ADDED_USER_TO_NOTIFY_LIST" }
+        } else {
+            res = { result: "USER_SESSION_INVALID" }
+        }
+        
+        return res
     })
 });
