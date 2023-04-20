@@ -66,6 +66,7 @@ model User {
     sessions        Session[]
     savedSnippets   SavedSnippets[]
     notifyUser      NotifyUser[]   
+    logSearch       LogSearch[]
     role            Role      @default(FREEUSER)
     searchQuota     Int       @default(7) //Need to refresh daily. Consider using AWS Lambda. Update to 40 if PREMIUMUSER.
     generateQuota   Int       @default(5) //Update to 20 and refresh daily if PREMIUMUSER. Consider using AWS Lambda.
@@ -125,4 +126,15 @@ model NotifyUser {
     user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
     modalDisplayed      Boolean @default(false)
     isInNotifyList      Boolean?
+}
+
+//To log searches for troubleshooting purposes
+model LogSearch {
+    id                  String @id @default(cuid())
+    userId              String
+    user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt           DateTime @default(now())
+    prompt              String
+    result              String
+    responseObj         String?
 }
