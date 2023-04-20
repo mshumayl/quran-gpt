@@ -131,7 +131,7 @@ model NotifyUser {
 //To log searches for troubleshooting purposes
 model LogSearch {
     id                  String @id @default(cuid())
-    userId              String @unique
+    userId              String
     user                User @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt           DateTime @default(now())
     prompt              String
