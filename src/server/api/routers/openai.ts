@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError, PrismaClientUnknownRequestError } from '@prisma/client/runtime';
 import { prisma } from '../../db';
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -206,6 +207,49 @@ export const openAiRouter = createTRPCRouter({
             })
         }
         
+        return res
+    }),
+
+    logUserSearch: protectedProcedure
+    .input(z.object({ prompt: z.string(), result: z.string(), respObj: z.string().nullish() }))
+    .mutation(async ({ ctx, input }) => {
+        
+        let res: openAiRespT;
+
+        try {
+            await prisma.logSearch.create({
+                data: {
+                    userId: ctx.session?.user.id,
+                    prompt: input.prompt,
+                    result: input.result,
+                    responseObj: input.respObj
+                }
+            })
+            res = {
+                result: "LOG_SEARCH_SUCCESS",
+                message: "Successfully logged into database"
+            }
+        } 
+        catch (e) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                res = {
+                    result: "PRISMA_CLIENT_KNOWN_REQUEST_ERROR",
+                    message: `${e.code}\n${e.message}`
+                }
+            } else if (e instanceof PrismaClientUnknownRequestError) {
+                res = {
+                    result: "PRISMA_CLIENT_UNKNOWN_REQUEST_ERROR", 
+                    message: `${e.message}`
+                }
+            } else {
+                res = {
+                    result: "UNKNOWN_LOG_USER_SEARCH_ERROR",
+                    message: "Unknown error in logUserSearch"
+                }
+            }
+            
+        }
+
         return res
     })
 });
