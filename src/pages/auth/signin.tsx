@@ -46,7 +46,7 @@ const SignIn = ({ providers }: { providers: AppProps }) => {
     <>
       <Head>
         <title>Log In - AI-Daleel</title>
-        <meta name="description" content="AI-powered al-Quran research companion" />
+        <meta name="description" content="AI-powered al-Quran research tool" />
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen items-center bg-slate-100">

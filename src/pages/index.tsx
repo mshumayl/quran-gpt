@@ -17,7 +17,7 @@ const Home: NextPage = () => {
     <>
       <Head>
         <title>AI-Daleel</title>
-        <meta name="description" content="AI-powered al-Quran research companion" />
+        <meta name="description" content="AI-powered al-Quran research tool" />
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">
@@ -38,7 +38,7 @@ const Home: NextPage = () => {
               </div>
             </div>
             <div className="text-center text-2xl md:text-4xl text-emerald-500 font-jost">
-              AI-powered al-Quran research companion
+              AI-powered al-Quran research tool
             </div>
             <div className="text-center text-lg md:text-xl text-slate-700 font-zilla-slab-italic">
               Supercharge your Quranic knowledge with a complete toolkit for querying and recording Quranic verses.

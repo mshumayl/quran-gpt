@@ -28,7 +28,7 @@ const Main: NextPage = () => {
     <>
       <Head>
         <title>Search Quran verses | AI-Daleel</title>
-        <meta name="description" content="AI-powered al-Quran research companion" />
+        <meta name="description" content="AI-powered al-Quran research tool" />
         <link rel="icon" href="/ai-daleel.ico" />
       </Head>
       <main className="flex flex-col min-h-screen min-w-fit items-center bg-slate-100">
@@ -48,7 +48,7 @@ const Main: NextPage = () => {
             </div>
           </div>
           <div className="text-center text-sm md:text-md font-zilla-slab tracking-wide text-slate-400">
-            AI-powered al-Quran research companion
+            AI-powered al-Quran research tool
           </div>
           <div className="mt-10 md:p-10 w-full md:w-2/3 flex flex-col items-center ">
               {/* TODO: Pass session object into PromptInput into VerseCard */}
