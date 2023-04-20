@@ -35,7 +35,7 @@ const NavBar: FC = () => {
           </div>
       </div>
       {(modalVisible) ? 
-      (<div className="fixed w-full top-56 hidden sm:flex justify-center bg-blue-200">
+      (<div className="fixed w-full my-20 hidden sm:flex justify-center bg-blue-200">
         <Modal setModalVisibleCallback={setModalVisible}/>
       </div>) :
       (<></>)}
