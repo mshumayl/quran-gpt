@@ -44,6 +44,7 @@ const PromptInput: FC = ({  }) => {
   const maxInputLength = 140;
 
   const submitApi = api.openai.submitPrompt.useMutation();
+  const logApi = api.openai.logUserSearch.useMutation();
 
   const { data: session } = useSession(); // To get quota
 
@@ -76,10 +77,18 @@ const PromptInput: FC = ({  }) => {
         setToasterResult(res.result);
         setToasterMessage(res.message);
 
+        //logSearch here. 
+        //Logging can be improved by doing it on client side.
+        //However need to make sure that the logging db IO does not slow down response time.
+        const logRes = await logApi.mutateAsync({ prompt: inputValue, result: res.result, respObj: JSON.stringify(res.respObj) });
+
       } else if (res.result && res.message) {
 
         setToasterResult(res.result);
         setToasterMessage(res.message);
+
+        //logSearch here
+        const logRes = await logApi.mutateAsync({ prompt: inputValue, result: res.result });
 
       } else {
 
@@ -87,6 +96,9 @@ const PromptInput: FC = ({  }) => {
         const message = "Unexpected input. Please try again."
         setToasterResult(result);
         setToasterMessage(message);
+
+        //logSearch here
+        const logRes = await logApi.mutateAsync({ prompt: inputValue, result: res.result });
 
       }
 
