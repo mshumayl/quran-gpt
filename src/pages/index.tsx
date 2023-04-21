@@ -8,7 +8,6 @@ import Link from "next/link";
 // import { api } from "~/utils/api";
 import NavBar from "~/components/NavBar";
 import MobileNavBar from "~/components/MobileNavBar";
-import { getSession } from "next-auth/react";
 
 const Home: NextPage = () => {
   // const hello = api.example.hello.useQuery({ text: "from tRPC" });
