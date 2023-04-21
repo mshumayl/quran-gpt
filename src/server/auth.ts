@@ -62,6 +62,13 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    // eslint-disable-next-line @typescript-eslint/require-await
+    async redirect({ url, baseUrl }) {
+      //pass
+      if (url.startsWith("/" )) return `${baseUrl}${url}`
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    }
   },
   adapter: PrismaAdapter(prisma),
   providers: [
