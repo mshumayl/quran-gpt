@@ -33,7 +33,7 @@ const Modal: FC<ModalProps> = ({ setModalVisibleCallback }) => {
             <div className="font-zilla-slab text-slate-600 text-md md:text-lg flex justify-center mt-8">However, we have good news! AI-Daleel Premium subscription is coming soon, which will provide you with more AI Search and AI Generate quotas.</div>
             <div className="font-zilla-slab text-slate-600 text-md md:text-lg flex justify-center mt-5">Would you like to be notified when the Premium subscription is available? Keep up-to-date and never miss out on the latest features!</div>
             <div className="grid justify-center mt-8 gap-2">
-                <button onClick={handleYesNotification} className="justify-center text-md md:text-lg text-white font-jost bg-emerald-400 hover:bg-emerald-500 py-1 px-2 rounded-lg">Notify Me</button>
+                <button onClick={handleYesNotification} className="justify-center text-md md:text-lg text-white font-zilla-slab bg-emerald-400 hover:bg-emerald-500 py-1 px-2 rounded-lg">Notify Me</button>
                 <button onClick={handleNoNotification} className="justify-center text-sm md:text-md text-slate-500 font-zilla-slab-italic mt-4">No Thanks</button>
             </div>
         </div>

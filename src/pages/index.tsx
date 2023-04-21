@@ -37,11 +37,11 @@ const Home: NextPage = () => {
                 -Daleel
               </div>
             </div>
-            <div className="text-center text-2xl md:text-4xl text-emerald-500 font-jost">
+            <div className="px-5 text-center text-xl md:text-4xl text-emerald-500 font-jost">
               AI-powered al-Quran research tool
             </div>
-            <div className="text-center text-lg md:text-xl text-slate-700 font-zilla-slab-italic">
-              Supercharge your Quranic knowledge with a complete toolkit for querying and recording Quranic verses.
+            <div className="px-5 text-center text-lg md:text-xl text-slate-700 font-zilla-slab-italic">
+              Easily explore and document Quranic verses with the help of our cutting-edge AI app.
             </div>
           </div>
         {/* Get Started Button */}
@@ -65,14 +65,16 @@ const Home: NextPage = () => {
                 <svg className="p-1 w-16 h-16 mb-4 bg-gradient-to-br fill-slate-100 rounded-xl from-emerald-300 to-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z"/></svg>
                 <div className="font-jost text-emerald-500 text-sm md:text-sm uppercase my-2 tracking-wider">Advanced AI-powered search</div>
                 <div className="font-zilla-slab text-md text-slate-600 ">
-                  From &quot;Where did Noah&apos;s ark land?&quot; to
-                  &quot;Apakah hukum merokok?&quot;, you can
-                  search for quick daleels in <a className="text-emerald-500 bg-slate-200 rounded-md px-1">any language</a> of your choice.
+                  From 
+                  <a className="text-slate-500 font-zilla-slab-italic"> &quot;Where did Noah&apos;s ark land?&quot;</a> to
+                  <a className="text-slate-500 font-zilla-slab-italic"> &quot;Apakah hukum merokok?&quot;</a>, to 
+                  <a className="text-slate-500 font-zilla-slab-italic"> &quot;Wasaari&apos;uu ila maghfiratin min rabbikum&quot;</a> you can
+                  search with keywords in <a className="text-emerald-500 bg-slate-200 rounded-md px-1">any language</a> of your choice.
                 </div>
               </div>
               <div className="flex flex-col items-center text-center m-2 mx-0 xl:mx-20 h-30 p-2">
                 <svg className="p-1 w-16 h-16 mb-4 bg-gradient-to-br fill-slate-100 rounded-xl from-emerald-300 to-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 17V7c0-2.168-3.663-4-8-4S4 4.832 4 7v10c0 2.168 3.663 4 8 4s8-1.832 8-4zM12 5c3.691 0 5.931 1.507 6 1.994C17.931 7.493 15.691 9 12 9S6.069 7.493 6 7.006C6.069 6.507 8.309 5 12 5zM6 9.607C7.479 10.454 9.637 11 12 11s4.521-.546 6-1.393v2.387c-.069.499-2.309 2.006-6 2.006s-5.931-1.507-6-2V9.607zM6 17v-2.393C7.479 15.454 9.637 16 12 16s4.521-.546 6-1.393v2.387c-.069.499-2.309 2.006-6 2.006s-5.931-1.507-6-2z"/></svg>
-                <div className="font-jost text-emerald-500 text-sm md:text-sm uppercase my-2 tracking-wider">A personal database of verses</div>
+                <div className="font-jost text-emerald-500 text-sm md:text-sm uppercase my-2 tracking-wider">A personal database of verse cards</div>
                 <div className="font-zilla-slab text-md text-slate-600">
                   Save favourite verses to your bookmarks to start building your own library of <a className="text-emerald-500 bg-slate-200 rounded-md px-1">Quranic verse cards</a>. 
                 </div>
@@ -88,7 +90,7 @@ const Home: NextPage = () => {
                 <svg className="p-1 w-16 h-16 mb-4 bg-gradient-to-br fill-slate-100 rounded-xl from-emerald-300 to-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 20h6v2H9zm7.906-6.288C17.936 12.506 19 11.259 19 9c0-3.859-3.141-7-7-7S5 5.141 5 9c0 2.285 1.067 3.528 2.101 4.73.358.418.729.851 1.084 1.349.144.206.38.996.591 1.921H8v2h8v-2h-.774c.213-.927.45-1.719.593-1.925.352-.503.726-.94 1.087-1.363zm-2.724.213c-.434.617-.796 2.075-1.006 3.075h-2.351c-.209-1.002-.572-2.463-1.011-3.08a20.502 20.502 0 0 0-1.196-1.492C7.644 11.294 7 10.544 7 9c0-2.757 2.243-5 5-5s5 2.243 5 5c0 1.521-.643 2.274-1.615 3.413-.373.438-.796.933-1.203 1.512z"/></svg>
                 <div className="font-jost text-emerald-500 text-sm md:text-sm uppercase my-2 tracking-wider">AI summarization of verse translations</div>
                 <div className="font-zilla-slab text-md text-slate-600">
-                  Create summaries on your verse cards and add them to your notes collection with the help of an <a className="text-emerald-500 bg-slate-200 rounded-md px-1">AI model</a>.
+                  Create summary notes on your verse cards with the help of the latest <a className="text-emerald-500 bg-slate-200 rounded-md px-1">GPT AI model</a>.
                 </div>
               </div>
               </div>

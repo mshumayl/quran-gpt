@@ -131,6 +131,7 @@ const PromptInput: FC = ({  }) => {
     "Inna fatahna laka fathan mubina",
     "Longest verse in the Quran",
     "Story of David vs Goliath",
+    "Wasaari'uu ila maghfiratin min rabbikum",
     "قصة موسى ضد فرعون",
     "Politics in Islam",
     "அரசியல் மற்றும் தலைமைத்துவம்",
