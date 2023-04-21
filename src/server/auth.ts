@@ -84,7 +84,7 @@ export const authOptions: NextAuthOptions = {
       clientSecret: env.GITHUB_CLIENT_SECRET,
       httpOptions: {
         timeout: 20000,
-      }
+      },
     })
     /**
      * ...add more providers here.
