@@ -20,5 +20,6 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  target: 'experimental-serverless-trace'
 };
 export default config;
