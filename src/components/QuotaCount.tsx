@@ -1,5 +1,3 @@
-import { signIn, signOut, useSession } from 'next-auth/react';
-import Link from 'next/link';
 import React, { useState, type FC, useEffect } from 'react'
 import { api } from '~/utils/api';
 
