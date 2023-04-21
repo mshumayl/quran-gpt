@@ -62,36 +62,20 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    // eslint-disable-next-line @typescript-eslint/require-await
-    async redirect({ url, baseUrl }) {
-      //pass
-      if (url.startsWith("/" )) return `${baseUrl}${url}`
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
-    }
   },
   adapter: PrismaAdapter(prisma),
   providers: [
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
-      httpOptions: {
-        timeout: 20000,
-      }
     }),
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-      httpOptions: {
-        timeout: 20000,
-      }
     }),
     GitHubProvider({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
-      httpOptions: {
-        timeout: 20000,
-      },
     })
     /**
      * ...add more providers here.
