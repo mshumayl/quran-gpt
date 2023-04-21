@@ -69,21 +69,21 @@ export const authOptions: NextAuthOptions = {
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
       httpOptions: {
-        timeout: 10000,
+        timeout: 20000,
       }
     }),
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       httpOptions: {
-        timeout: 10000,
+        timeout: 20000,
       }
     }),
     GitHubProvider({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
       httpOptions: {
-        timeout: 10000,
+        timeout: 20000,
       }
     })
     /**
