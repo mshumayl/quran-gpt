@@ -49,6 +49,8 @@ export const dbRouter = createTRPCRouter({
         const verseText = queryVerseText?.verseText;
         const verseTranslation = queryVerseText?.verseTranslation;
 
+        console.log("Fetchverse Successfully Run: ", surahName, verseText, verseTranslation)
+
         return ({ surahName, verseText, verseTranslation })
     }),
 
