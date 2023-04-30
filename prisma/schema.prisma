@@ -71,6 +71,7 @@ model User {
     searchQuota     Int       @default(7) //Need to refresh daily. Consider using AWS Lambda. Update to 40 if PREMIUMUSER.
     generateQuota   Int       @default(5) //Update to 20 and refresh daily if PREMIUMUSER. Consider using AWS Lambda.
     bookmarkQuota   Int       @default(5) //Need to refresh daily. Consider using AWS Lambda. 100 if PREMIUMUSER.
+    quotaRefreshTs  DateTime? 
     //noteQuota needs to be calculated on client-side, based on the note count on that specific snippetId. Unlimited if PREMIUMUSER.
 }
 
